@@ -1,0 +1,75 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "./framework/*"
+      ],
+      "@config/*": [
+        "./framework/config/*"
+      ],
+      "@core/*": [
+        "./framework/core/*"
+      ],
+      "@interactions/*": [
+        "./framework/interactions/*"
+      ],
+      "@utils/*": [
+        "./framework/utils/*"
+      ],
+      "@constants/*": [
+        "./framework/constants/*"
+      ],
+      "@tests/*": [
+        "./tests/*"
+      ],
+      "@data/*": [
+        "./data/*"
+      ],
+      "@fixtures/*": [
+        "./fixtures/*"
+      ],
+      "@api/*": [
+        "./tests/api/*"
+      ],
+      "@visual/*": [
+        "./tests/visual/*"
+      ],
+      "@performance/*": [
+        "./tests/performance/*"
+      ],
+      "@accessibility/*": [
+        "./tests/accessibility/*"
+      ],
+      "@mobile/*": [
+        "./tests/mobile/*"
+      ],
+      "@cloud/*": [
+        "./framework/cloud/*"
+      ]
+    }
+  },
+  "include": [
+    "framework/**/*",
+    "tests/**/*",
+    "sample-tests/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test-results",
+    "playwright-report"
+  ]
+}

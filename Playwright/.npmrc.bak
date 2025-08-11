@@ -1,0 +1,13 @@
+# GitLab Registry Configuration
+# Replace YOUR_GITLAB_TOKEN and YOUR_PROJECT_ID with actual values
+
+# GitLab NPM Registry
+@Madhukar Banoth:registry=https://gitlab.com/api/v4/packages/npm/
+//gitlab.com/api/v4/packages/npm/:_authToken=${GITLAB_TOKEN}
+
+# Optional: Set the project-specific registry
+# @Madhukar Banoth:registry=https://gitlab.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/
+# //gitlab.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/:_authToken=${GITLAB_TOKEN}
+
+# Package access level (optional)
+# @Madhukar Banoth:always-auth=true 

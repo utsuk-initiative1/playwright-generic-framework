@@ -1,0 +1,54 @@
+{
+  "name": "@your-gitlab-username/playwright-enhanced-cli",
+  "version": "1.0.0",
+  "description": "Enhanced Playwright Framework CLI - A powerful CLI tool for setting up comprehensive Playwright automation frameworks",
+  "main": "enhanced-cli.js",
+  "bin": {
+    "playwright-enhanced": "./enhanced-cli.js"
+  },
+  "scripts": {
+    "start": "node enhanced-cli.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "publish-gitlab": "npm publish --registry=https://gitlab.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "automation",
+    "framework",
+    "cli",
+    "e2e",
+    "typescript",
+    "page-object-model",
+    "test-automation",
+    "web-testing"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/your-gitlab-username/playwright-enhanced-cli.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/your-gitlab-username/playwright-enhanced-cli/issues"
+  },
+  "homepage": "https://gitlab.com/your-gitlab-username/playwright-enhanced-cli#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "fs-extra": "^11.0.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "files": [
+    "enhanced-cli.js",
+    "run-enhanced-cli.js",
+    "cli-templates/",
+    "ENHANCED_CLI_README.md",
+    "README.md"
+  ]
+}

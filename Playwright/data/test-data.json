@@ -1,0 +1,71 @@
+{
+  "users": {
+    "admin": {
+      "username": "admin@example.com",
+      "password": "admin123",
+      "role": "administrator"
+    },
+    "standard": {
+      "username": "user@example.com",
+      "password": "user123",
+      "role": "user"
+    },
+    "premium": {
+      "username": "premium@example.com",
+      "password": "premium123",
+      "role": "premium"
+    }
+  },
+  "products": {
+    "laptop": {
+      "name": "Gaming Laptop",
+      "price": 1299.99,
+      "category": "electronics",
+      "sku": "LAP-001"
+    },
+    "phone": {
+      "name": "Smartphone Pro",
+      "price": 799.99,
+      "category": "electronics",
+      "sku": "PHN-001"
+    },
+    "headphones": {
+      "name": "Wireless Headphones",
+      "price": 199.99,
+      "category": "accessories",
+      "sku": "HDP-001"
+    }
+  },
+  "testUrls": {
+    "homepage": "${this.config.baseURL}",
+    "login": "${this.config.baseURL}/login",
+    "register": "${this.config.baseURL}/register",
+    "search": "${this.config.baseURL}/search"
+  },
+  "selectors": {
+    "navigation": {
+      "menu": ".nav-menu",
+      "logo": ".logo",
+      "search": "#search-input",
+      "login": ".login-btn"
+    },
+    "forms": {
+      "username": "#username",
+      "password": "#password",
+      "email": "#email",
+      "submit": ".submit-btn"
+    },
+    "content": {
+      "title": "h1",
+      "description": ".description",
+      "price": ".price",
+      "addToCart": ".add-to-cart"
+    }
+  },
+  "testConfig": {
+    "timeout": 30000,
+    "retries": 2,
+    "screenshotOnFailure": true,
+    "videoRecording": true
+  }
+}

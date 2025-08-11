@@ -1,0 +1,40 @@
+{
+  "name": "playwright-framework-cli",
+  "version": "1.0.0",
+  "description": "CLI tool to quickly set up a comprehensive Playwright automation framework",
+  "main": "cli.js",
+  "bin": {
+    "playwright-framework": "./cli.js",
+    "pw-framework": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "framework",
+    "cli",
+    "testing",
+    "e2e",
+    "typescript",
+    "setup",
+    "scaffold"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/playwright-framework-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/playwright-framework-cli/issues"
+  },
+  "homepage": "https://github.com/yourusername/playwright-framework-cli#readme",
+  "dependencies": {},
+  "devDependencies": {}
+} 

@@ -1,0 +1,50 @@
+{
+  "testCredentials": {
+    "validUser": {
+      "email": "test@example.com",
+      "password": "TestPassword123!"
+    },
+    "invalidUser": {
+      "email": "invalid@example.com",
+      "password": "WrongPassword"
+    }
+  },
+  "formData": {
+    "registration": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "password": "SecurePass123!",
+      "confirmPassword": "SecurePass123!"
+    },
+    "contact": {
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "message": "This is a test message for contact form testing."
+    }
+  },
+  "searchTerms": [
+    "web design",
+    "mobile app",
+    "user interface",
+    "responsive design",
+    "creative portfolio"
+  ],
+  "testImages": {
+    "profile": "profile-avatar.jpg",
+    "product": "product-image.png",
+    "banner": "banner-image.jpg"
+  },
+  "apiEndpoints": {
+    "users": "/api/users",
+    "products": "/api/products",
+    "orders": "/api/orders",
+    "auth": "/api/auth"
+  },
+  "expectedTexts": {
+    "welcome": "Welcome to our platform",
+    "loginSuccess": "Successfully logged in",
+    "errorMessage": "Invalid credentials",
+    "pageTitle": "Website Title"
+  }
+}

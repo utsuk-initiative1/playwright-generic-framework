@@ -1,0 +1,51 @@
+{
+  "name": "AI generation",
+  "version": "2.0.0",
+  "description": "Comprehensive Playwright automation framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test --config=framework.config.ts",
+    "test:ui": "playwright test --config=framework.config.ts --ui",
+    "test:headed": "playwright test --config=framework.config.ts --headed",
+    "test:debug": "playwright test --config=framework.config.ts --debug",
+    "test:packages": "playwright test packages/tests/ --config=framework.config.ts",
+    "test:example": "playwright test packages/tests/example-test.spec.ts --config=framework.config.ts",
+    "test:all": "playwright test --config=framework.config.ts",
+    "test:suites": "playwright test --config=framework.config.ts --reporter=html && playwright show-report",
+    "test:parallel": "playwright test --config=framework.config.ts --workers=4",
+    "test:sequential": "playwright test --config=framework.config.ts --workers=1",
+    "test:chrome": "playwright test --config=framework.config.ts --project=chromium",
+    "test:firefox": "playwright test --config=framework.config.ts --project=firefox",
+    "test:safari": "playwright test --config=framework.config.ts --project=webkit",
+    "test:mobile": "playwright test --config=framework.config.ts --project=mobile-chrome",
+    "test:staging": "TEST_ENV=staging playwright test --config=framework.config.ts",
+    "test:production": "TEST_ENV=production playwright test --config=framework.config.ts",
+    "test:local": "TEST_ENV=local playwright test --config=framework.config.ts",
+    "report": "playwright show-report",
+    "install-browsers": "playwright install",
+    "codegen": "playwright codegen",
+    "trace": "playwright show-trace",
+    "packages:setup": "node -e \"console.log('Packages setup completed. Update framework.config.ts with your application URLs.')\"",
+    "packages:docs": "echo 'Packages documentation available at packages/README.md'"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "automation",
+    "framework",
+    "e2e",
+    "typescript",
+    "page-object-model",
+    "api-testing",
+    "mobile-testing"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.53.0",
+    "@types/node": "^20.11.24"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
