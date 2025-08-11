@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Playwright Framework CLI Installation Script
-# This script installs the CLI tool globally
+# This script installs the CLI tool globally from GitHub Packages
 
 set -e
 
@@ -35,12 +35,49 @@ check_node() {
     echo "npm version: $(npm --version)"
 }
 
+# Setup GitHub Packages authentication
+setup_github_packages() {
+    echo -e "${YELLOW}🔐 Setting up GitHub Packages authentication...${NC}"
+    
+    # Check if GITHUB_TOKEN is set
+    if [ -z "$GITHUB_TOKEN" ]; then
+        echo -e "${YELLOW}⚠️  GITHUB_TOKEN environment variable not set.${NC}"
+        echo "You can set it with: export GITHUB_TOKEN=your_github_token"
+        echo "Or create a .npmrc file manually with your GitHub token."
+        echo ""
+        echo "To get a GitHub token:"
+        echo "1. Go to GitHub → Settings → Developer settings → Personal access tokens"
+        echo "2. Generate a new token with 'read:packages' scope"
+        echo "3. Set it as: export GITHUB_TOKEN=your_token"
+        echo ""
+        read -p "Do you want to continue without setting up authentication? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    else
+        echo -e "${GREEN}✅ GITHUB_TOKEN is set${NC}"
+    fi
+}
+
 # Install the CLI tool
 install_cli() {
-    echo -e "${YELLOW}📦 Installing Playwright Framework CLI...${NC}"
+    echo -e "${YELLOW}📦 Installing Playwright Framework CLI from GitHub Packages...${NC}"
     
-    # Install globally
-    npm install -g @utsuk-initiative1/playwright-framework-cli
+    # Create temporary .npmrc for installation
+    if [ -n "$GITHUB_TOKEN" ]; then
+        echo "@utsuk-initiative1:registry=https://npm.pkg.github.com" > /tmp/.npmrc
+        echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> /tmp/.npmrc
+        
+        # Install using the temporary .npmrc
+        npm install -g @utsuk-initiative1/playwright-framework-cli --userconfig /tmp/.npmrc
+        
+        # Clean up
+        rm /tmp/.npmrc
+    else
+        # Try to install without authentication (will work if package is public)
+        npm install -g @utsuk-initiative1/playwright-framework-cli
+    fi
     
     echo -e "${GREEN}✅ CLI tool installed successfully!${NC}"
 }
@@ -94,6 +131,7 @@ show_usage() {
 # Main execution
 main() {
     check_node
+    setup_github_packages
     install_cli
     verify_installation
     show_usage
