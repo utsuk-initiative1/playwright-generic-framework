@@ -1,92 +1,263 @@
-# Playwright Automation Framework
+# 🚀 Playwright Framework CLI
 
-A comprehensive Playwright automation framework with TypeScript support.
+A comprehensive CLI tool to set up Playwright automation frameworks with AI-powered test generation, accessibility testing, and advanced features.
 
-## Features
+## 📦 Installation
 
-- api testing
-- visual testing
-- performance testing
-- accessibility testing
-- mobile testing
-- ci cd-templates
-- docker support
-- cloud testing
-- reporting dashboard
-- test generator
-- interactions module
-- runner configuration
-- utilities module
-- constants module
+```bash
+# Install globally
+npm install -g @utsuk-initiative1/playwright-framework-cli
 
-## Quick Start
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Install Playwright browsers:
-   ```bash
-   npx playwright install
-   ```
-
-3. Run tests:
-   ```bash
-   npm test
-   ```
-
-## Available Scripts
-
-- `npm test` - Run all tests
-- `npm run test:ui` - Run tests with Playwright UI
-- `npm run test:headed` - Run tests in headed mode
-- `npm run test:debug` - Run tests in debug mode
-- `npm run test:chrome` - Run tests only in Chrome
-- `npm run test:firefox` - Run tests only in Firefox
-- `npm run test:safari` - Run tests only in Safari
-- `npm run test:mobile` - Run tests on mobile devices
-- `npm run test:staging` - Run tests against staging environment
-- `npm run test:production` - Run tests against production environment
-- `npm run report` - Show test report
-
-## Project Structure
-
-```
-Test567/
-├── packages/
-│   ├── config/          # Configuration files
-│   ├── core/            # Core framework classes
-│   ├── pages/           # Page Object Models
-│   ├── setup/           # Global setup/teardown
-│   ├── tests/           # Test files
-│   └── utils/           # Utility functions
-├── data/                # Test data files
-├── fixtures/            # Test fixtures
-├── sample-tests/        # Sample test suites
-├── test-results/        # Test execution results
-└── playwright-report/   # HTML test reports
+# Or install locally in a project
+npm install @utsuk-initiative1/playwright-framework-cli
 ```
 
-## Configuration
+## 🎯 Usage
 
-Update `packages/config/EnvironmentConfig.ts` to configure your environments.
+After installation, you can use any of these commands:
 
-## Writing Tests
+```bash
+# Main command
+playwright-framework
 
-1. Create page objects in `packages/pages/`
-2. Write tests in `packages/tests/`
-3. Use the BasePage class for common operations
+# Short alias
+pw-framework
 
-## Environment Variables
+# Branded command
+utsuk-playwright
+```
 
-- `TEST_ENV` - Set environment (local, staging, production)
-- `TEST_USERNAME` - Test username
-- `TEST_PASSWORD` - Test password
+## 🚀 Quick Start
 
-## Contributing
+```bash
+# Install the CLI
+npm install -g @utsuk-initiative1/playwright-framework-cli
 
-1. Follow the existing code structure
-2. Add proper TypeScript types
-3. Include meaningful test descriptions
-4. Use page object model pattern
+# Run the CLI
+playwright-framework
+
+# Follow the interactive prompts to set up your framework
+```
+
+## ✨ Features
+
+### 🎯 Interactive Project Setup
+- Guided project creation with multiple templates
+- Customizable framework configuration
+- Environment-specific settings
+
+### 🤖 AI-Powered Test Generation
+- Generate tests using Gemini AI
+- Smart test case creation
+- Automated test data generation
+
+### ♿ Accessibility Testing
+- Built-in accessibility testing modules
+- WCAG compliance checking
+- Screen reader compatibility tests
+
+### 📊 Performance Testing
+- Lighthouse integration
+- Performance benchmarking
+- Load testing capabilities
+
+### 📱 Mobile Testing
+- Mobile device simulation
+- Touch gesture testing
+- Responsive design validation
+
+### 🔍 Visual Regression Testing
+- Screenshot comparison
+- Baseline management
+- Visual diff reporting
+
+### 🧪 API Testing
+- REST API testing
+- GraphQL support
+- API documentation generation
+
+### 📈 Comprehensive Reporting
+- HTML reports
+- JSON output
+- Custom report formats
+
+## 🏗️ Framework Templates
+
+### 1. Basic Template
+- Essential Playwright setup
+- Basic test structure
+- Minimal configuration
+
+### 2. Standard Template
+- Full testing framework
+- Page Object Model
+- Common test utilities
+
+### 3. Enterprise Template
+- Advanced features
+- CI/CD integration
+- Comprehensive reporting
+
+### 4. Mobile Template
+- Mobile-specific testing
+- Touch interactions
+- Device simulation
+
+## 🛠️ CLI Commands
+
+```bash
+# Create a new project
+playwright-framework
+
+# With AI test generation
+playwright-framework --api-key=your_gemini_api_key
+
+# Specify AI model
+playwright-framework --api-key=your_key --ai-model=gemini-1.5sh
+
+# Show help
+playwright-framework --help
+```
+
+## 📁 Generated Project Structure
+
+```
+your-project/
+├── framework/
+│   ├── config/
+│   │   ├── EnvironmentConfig.ts
+│   │   └── runner.config.ts
+│   ├── core/
+│   │   ├── BasePage.ts
+│   │   ├── BasePageObject.ts
+│   │   └── TestBase.ts
+│   ├── interactions/
+│   │   ├── Accessibility.ts
+│   │   ├── BrowserActions.ts
+│   │   ├── Click.ts
+│   │   ├── Dropdown.ts
+│   │   ├── Elements.ts
+│   │   ├── Scroll.ts
+│   │   ├── Type.ts
+│   │   ├── Wait.ts
+│   │   ├── WindowHandler.ts
+│   │   └── index.ts
+│   ├── utils/
+│   │   └── Utilities.ts
+│   └── constants/
+│       └── Constants.ts
+├── tests/
+│   ├── smoke/
+│   ├── regression/
+│   ├── e2e/
+│   ├── accessibility/
+│   ├── performance/
+│   ├── api/
+│   ├── visual/
+│   └── mobile/
+├── data/
+│   └── test-data.json
+├── fixtures/
+│   └── sample-data.json
+├── baseline-screenshots/
+├── reports/
+├── ci-cd/
+├── dashboard/
+├── playwright.config.ts
+├── framework.config.ts
+├── tsconfig.json
+└── package.json
+```
+
+## 🔧 Configuration Options
+
+### Environment Configuration
+- Local, staging, and production environments
+- Environment-specific URLs and credentials
+- Custom configuration per environment
+
+### Test Configuration
+- Browser selection (Chrome, Firefox, Safari, Edge)
+- Mobile device simulation
+- Parallel test execution
+- Retry mechanisms
+
+### AI Configuration
+- Gemini API integration
+- Custom AI models
+- Test generation parameters
+- AI prompt customization
+
+## 📊 Reporting Features
+
+### HTML Reports
+- Interactive test results
+- Screenshot galleries
+- Performance metrics
+- Accessibility violations
+
+### JSON Reports
+- Machine-readable output
+- CI/CD integration
+- Custom report processing
+
+### Dashboard
+- Real-time test monitoring
+- Historical data analysis
+- Performance trends
+- Team collaboration
+
+## 🚀 CI/CD Integration
+
+### GitHub Actions
+- Automated testing
+- Parallel execution
+- Artifact management
+- Slack notifications
+
+### GitLab CI
+- Pipeline integration
+- Docker support
+- Artifact storage
+- Merge request validation
+
+### Jenkins
+- Pipeline scripts
+- Multi-branch support
+- Test result analysis
+- Deployment integration
+
+## 📚 Documentation
+
+- [CLI README](./CLI_README.md) - Detailed CLI documentation
+- [Quick Start Guide](./QUICK_START.md) - Step-by-step setup
+- [Enhanced CLI README](./ENHANCED_CLI_README.md) - Advanced features
+- [Framework Documentation](./docs/README.md) - Framework usage
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](../LICENSE) for details
+
+## 🆘 Support
+
+- [GitHub Issues](https://github.com/utsuk-initiative1/playwright-generic-framework/issues)
+- [Documentation](./docs/README.md)
+- [Examples](./sample-tests/)
+
+## 🎉 Acknowledgments
+
+- Playwright team for the amazing testing framework
+- Google Gemini for AI-powered test generation
+- The open-source community for contributions
+
+---
+
+**Made with ❤️ by Utsuk Initiative**
