@@ -1,11 +1,8 @@
 {
-  "name": "@madukar14/playwright-enhanced-cli",
-  "version": "2.0.2",
+  "name": "Madhu",
+  "version": "2.0.0",
   "description": "Comprehensive Playwright automation framework",
-  "main": "Playwright/enhanced-cli.js",
-  "bin": {
-    "playwright-enhanced": "./Playwright/enhanced-cli.js"
-  },
+  "main": "index.js",
   "scripts": {
     "test": "playwright test --config=framework.config.ts",
     "test:ui": "playwright test --config=framework.config.ts --ui",
