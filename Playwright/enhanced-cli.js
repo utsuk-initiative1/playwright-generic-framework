@@ -14,7 +14,6 @@ class EnhancedPlaywrightCLI {
     this.projectName = '';
     this.config = {};
     this.features = {};
-    this.aiConfig = {};
     
     // Parse command line arguments
     this.parseCommandLineArgs();
@@ -22,19 +21,12 @@ class EnhancedPlaywrightCLI {
 
   parseCommandLineArgs() {
     const args = process.argv.slice(2);
-    this.cliArgs = {
-      apiKey: null,
-      aiModel: 'gemini-1.5sh'
-    };
+    this.cliArgs = {};
     
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
       
-      if (arg.startsWith('--api-key=')) {
-        this.cliArgs.apiKey = arg.split('=')[1];
-      } else if (arg.startsWith('--ai-model=')) {
-        this.cliArgs.aiModel = arg.split('=')[1];
-      } else if (arg === '--help' || arg === '-h') {
+      if (arg === '--help' || arg === '-h') {
         this.showHelp();
         process.exit(0);
       }
@@ -45,26 +37,15 @@ class EnhancedPlaywrightCLI {
     console.log('\n🚀 Enhanced Playwright Framework CLI\n');
     console.log('Usage: node enhanced-cli.js [options]\n');
     console.log('Options:');
-    console.log('  --api-key=<KEY>     Gemini API key for AI test generation');
-    console.log('  --ai-model=<MODEL>  AI model to use (default: gemini-1.5sh)');
     console.log('  --help, -h          Show this help message\n');
     console.log('Examples:');
-    console.log('  node enhanced-cli.js --api-key=your_gemini_api_key');
-    console.log('  node enhanced-cli.js --api-key=your_key --ai-model=gemini-10.5\n');
+    console.log('  node enhanced-cli.js');
+    console.log('  node enhanced-cli.js --help\n');
   }
 
   async run() {
     console.log('\n🚀 Enhanced Playwright Framework CLI\n');
     console.log('A powerful CLI tool for setting up comprehensive Playwright automation frameworks.\n');
-
-    // Show API key status if provided
-    if (this.cliArgs.apiKey) {
-      console.log('🔑 API Key: Provided via command line');
-      if (this.cliArgs.aiModel) {
-        console.log(`🤖 AI Model: ${this.cliArgs.aiModel}`);
-      }
-      console.log(')');
-    }
 
     try {
       await this.showMainMenu();
@@ -118,7 +99,6 @@ class EnhancedPlaywrightCLI {
     
     await this.getProjectDetails();
     await this.selectFrameworkTemplate();
-    await this.selectAITestGeneration();
     await this.createProjectStructure();
     await this.installDependencies();
     await this.configureEnvironment();
@@ -339,37 +319,7 @@ class EnhancedPlaywrightCLI {
     return names[template] || 'Standard';
   }
 
-  async selectAITestGeneration() {
-    console.log('\n🤖 AI-Powered Test Generation\n');
-    console.log('Would you like to generate AI-powered Playwright tests for your application?');
-    const generateAI = await this.question('Generate AI tests? (y/N): ');
-    if (generateAI.toLowerCase() === 'y') {
-      console.log('\n📋 AI Test Configuration\n');
-      
-      // Use the base URL from project details if available, otherwise prompt
-      let aiBaseURL = this.config.baseURL;
-      if (!aiBaseURL || aiBaseURL === 'https://example.com') {
-        aiBaseURL = await this.question('Enter the base URL for AI test generation: ');
-      } else {
-        const useProjectURL = await this.question(`Use project base URL (${aiBaseURL}) for AI tests? (Y/n): `);
-        if (useProjectURL.toLowerCase() === 'n') {
-          aiBaseURL = await this.question('Enter the base URL for AI test generation: ');
-        }
-      }
-      
-      const testType = await this.question('Select test type (basic/regression) [regression]: ') || 'regression';
-      // Store AI configuration for later use
-      this.aiConfig = { enabled: true, baseURL: aiBaseURL, testType: testType };
-      
-      console.log(`\n✅ AI test generation configured:`);
-      console.log(`   URL: ${aiBaseURL}`);
-      console.log(`   Type: ${testType}`);
-      console.log(`   Tests will be generated after project setup.\n`);
-    } else {
-      this.aiConfig = { enabled: false };
-      console.log('\n⏭️  Skipping AI test generation.\n');
-    }
-  }
+
 
   async createProjectStructure() {
     console.log('📁 Creating project structure...\n');
@@ -915,12 +865,6 @@ class EnhancedPlaywrightCLI {
   async displayNextSteps() {
     console.log('🎉 Framework setup completed successfully!\n');
     
-    // Generate AI tests if configured
-    if (this.aiConfig && this.aiConfig.enabled) {
-      console.log('🤖 Generating AI-powered tests...\n');
-      await this.generateAITestsForProject();
-    }
-    
     console.log('📋 Next Steps:\n');
     console.log(`1. Navigate to your project: cd ${this.projectName}`);
     console.log('2. Update framework/config/EnvironmentConfig.ts with your application URLs');
@@ -936,59 +880,13 @@ class EnhancedPlaywrightCLI {
       console.log('7. Build Docker image: npm run docker:build');
     }
     
-    if (this.aiConfig && this.aiConfig.enabled) {
-      console.log('8. Review AI-generated tests in sample-tests/');
-    }
-    
     console.log('\n📚 Documentation:');
     console.log('- Framework README: README.md');
     console.log('- Playwright docs: https://playwright.dev/');
     console.log('\n🚀 Happy testing!\n');
   }
 
-  async generateAITestsForProject() {
-    const { execSync } = require('child_process');
-    const projectPath = this.getProjectPath('');
-    
-    try {
-      console.log(`🤖 Generating ${this.aiConfig.testType} tests for ${this.aiConfig.baseURL}...`);
-      
-      // Check if API key is available
-      if (!this.cliArgs.apiKey) {
-        console.log('⚠️  No API key provided. AI test generation will be skipped.');
-        console.log('💡 Tip: Run with --api-key=<YOUR_GEMINI_API_KEY> to enable AI test generation');
-        return;
-      }
-      
-      // Determine which script to use
-      let script;
-      if (this.aiConfig.testType === 'regression') {
-        script = 'framework/ai/regression-test-generator.js';
-      } else {
-        script = 'framework/ai/fixed-generate-tests.js';
-      }
-      
-      // Set environment variables for the AI script
-      const env = { ...process.env };
-      env.AI_API_KEY = this.cliArgs.apiKey;
-      env.AI_MODEL = this.cliArgs.aiModel || 'gemini-10.5ash';
-      
-      // Run the AI test generation script with API key
-      execSync(`node ${script} ${this.aiConfig.baseURL}`, {
-        cwd: projectPath,
-        stdio: 'inherit',
-        env: env
-      });
-      
-      console.log('✅ AI-generated tests created successfully!');
-      console.log('📁 Tests are available in sample-tests/ directory');
-      
-    } catch (error) {
-      console.log('⚠️  AI test generation failed. You can run it manually later:');
-      console.log(`   cd ${this.projectName}`);
-      console.log(`   AI_API_KEY=${this.cliArgs.apiKey} node framework/ai/${this.aiConfig.testType === 'regression' ? 'regression-test-generator.js' : 'fixed-generate-tests.js'} ${this.aiConfig.baseURL}`);
-    }
-  }
+
 
   // Generate configuration files (simplified versions)
   generateEnvironmentConfig() {
@@ -6569,30 +6467,7 @@ test.describe('Sample Tests for ${domain}', () => {
 });`;
   }
 
-  async generateAITests() {
-    console.log('\n🤖 AI-Powered Playwright Test Generation\n');
-    const url = await this.question('Enter the base URL to generate tests for: ');
-    const type = await this.question('Enter test type (basic/regression) [regression]: ') || 'regression';
-    const { execSync } = require('child_process');
-    let script;
-    if (type === 'regression') {
-      script = 'framework/ai/regression-test-generator.js';
-    } else {
-      script = 'framework/ai/fixed-generate-tests.js';
-    }
-    try {
-      console.log(`\n🤖 Generating AI-powered Playwright test suite (${type}) for ${url}...`);
-      execSync(`node ${script} ${url}`, {
-        cwd: process.cwd(),
-        stdio: 'inherit',
-      });
-      console.log('✅ AI-generated tests are available in /sample-tests/');
-    } catch (err) {
-      console.error('❌ AI test generation failed:', err.message);
-    }
-    // Return to main menu
-    await this.showMainMenu();
-  }
+
 }
 
 // Export the enhanced CLI

@@ -1,6 +1,6 @@
 # 🚀 Playwright Generic Framework
 
-A comprehensive, modular Playwright automation framework with AI-powered test generation, supporting E2E, API, mobile, accessibility, and visual testing.
+A comprehensive, modular Playwright automation framework supporting E2E, API, mobile, accessibility, performance, and visual testing.
 
 ## 📦 Quick Start with CLI
 
@@ -26,7 +26,7 @@ playwright-framework
 This framework provides a complete testing solution with:
 
 - 🎯 **Interactive CLI Setup** - Guided project creation
-- 🤖 **AI-Powered Test Generation** - Using Google Gemini
+
 - ♿ **Accessibility Testing** - WCAG compliance checking
 - 📱 **Mobile Testing** - Device simulation and touch testing
 - 🔍 **Visual Regression Testing** - Screenshot comparison
@@ -104,7 +104,6 @@ utsuk-playwright
 2. **Target URL** - Your application URL
 3. **Template** - Basic, Standard, Enterprise, or Mobile
 4. **Features** - Select testing capabilities
-5. **AI Setup** - Configure Gemini API (optional)
 
 ### Step 5: Run Your Tests
 ```bash
@@ -122,8 +121,7 @@ playwright-framework          # Main command
 pw-framework                  # Short alias
 utsuk-playwright             # Branded command
 
-# With AI features
-playwright-framework --api-key=your_gemini_api_key
+
 ```
 
 ### Test Commands
@@ -166,19 +164,7 @@ npm run trace               # Show trace viewer
 npm run update-baselines    # Update visual test baselines
 ```
 
-## 🤖 AI-Powered Features
 
-### Setup Gemini API
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Generate API key
-3. Use with CLI: `playwright-framework --api-key=your_key`
-
-### AI Capabilities
-- **Smart Test Generation** - AI creates test cases based on your website
-- **Test Data Generation** - Realistic test data creation
-- **Accessibility Analysis** - AI identifies accessibility issues
-- **Performance Insights** - AI suggests improvements
-- **Code Optimization** - AI optimizes test code
 
 ## 📊 Reporting & Analytics
 
@@ -414,7 +400,7 @@ MIT License - see [LICENSE](LICENSE) for details
 ## 🎉 Acknowledgments
 
 - **Playwright Team** - For the amazing testing framework
-- **Google Gemini** - For AI-powered test generation
+
 - **Open Source Community** - For contributions and feedback
 
 ---

@@ -1,6 +1,6 @@
 # 🚀 Playwright Framework CLI
 
-A comprehensive CLI tool to set up Playwright automation frameworks with AI-powered test generation, accessibility testing, and advanced features.
+A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, and advanced features.
 
 ## 📦 Installation
 
@@ -46,10 +46,7 @@ playwright-framework
 - Customizable framework configuration
 - Environment-specific settings
 
-### 🤖 AI-Powered Test Generation
-- Generate tests using Gemini AI
-- Smart test case creation
-- Automated test data generation
+
 
 ### ♿ Accessibility Testing
 - Built-in accessibility testing modules
@@ -109,11 +106,7 @@ playwright-framework
 # Create a new project
 playwright-framework
 
-# With AI test generation
-playwright-framework --api-key=your_gemini_api_key
 
-# Specify AI model
-playwright-framework --api-key=your_key --ai-model=gemini-1.5sh
 
 # Show help
 playwright-framework --help
@@ -182,11 +175,7 @@ your-project/
 - Parallel test execution
 - Retry mechanisms
 
-### AI Configuration
-- Gemini API integration
-- Custom AI models
-- Test generation parameters
-- AI prompt customization
+
 
 ## 📊 Reporting Features
 
@@ -255,7 +244,7 @@ MIT License - see [LICENSE](../LICENSE) for details
 ## 🎉 Acknowledgments
 
 - Playwright team for the amazing testing framework
-- Google Gemini for AI-powered test generation
+
 - The open-source community for contributions
 
 ---
