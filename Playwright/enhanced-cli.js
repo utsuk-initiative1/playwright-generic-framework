@@ -99,6 +99,12 @@ class EnhancedPlaywrightCLI {
     
     await this.getProjectDetails();
     await this.selectFrameworkTemplate();
+    
+    // Check if mobile automation is selected
+    if (this.features['mobile-testing']) {
+      await this.setupMobileAutomation();
+    }
+    
     await this.createProjectStructure();
     await this.installDependencies();
     await this.configureEnvironment();
@@ -317,6 +323,115 @@ class EnhancedPlaywrightCLI {
       '5': 'Custom'
     };
     return names[template] || 'Standard';
+  }
+
+  async setupMobileAutomation() {
+    console.log('\n📱 Mobile Automation Setup\n');
+    
+    try {
+      // Import required modules
+      const AppAnalyzer = require('./mobile/analysis/AppAnalyzer');
+      const PageObjectGenerator = require('./mobile/generator/PageObjectGenerator');
+      
+      // Get mobile platform selection
+      const platform = await this.selectMobilePlatform();
+      
+      // Get app file path
+      const appFilePath = await this.getAppFilePath(platform);
+      
+      // Analyze the app
+      console.log('\n🔍 Analyzing mobile app...');
+      const analyzer = new AppAnalyzer();
+      const analysis = await analyzer.analyzeApp(appFilePath);
+      
+      // Display analysis results
+      await this.displayAppAnalysis(analysis);
+      
+      // Generate mobile framework
+      console.log('\n📝 Generating mobile automation framework...');
+      const generator = new PageObjectGenerator(this.getProjectPath(''));
+      await generator.generateFramework(analysis);
+      
+      console.log('\n✅ Mobile automation setup completed!');
+      
+    } catch (error) {
+      console.error('\n❌ Mobile automation setup failed:', error.message);
+      console.log('⚠️  Mobile automation will be skipped. You can set it up manually later.');
+    }
+  }
+
+  async selectMobilePlatform() {
+    console.log('📱 Select Mobile Platform\n');
+    console.log('1. Android (.apk)');
+    console.log('2. iOS (.ipa)');
+    console.log('3. Both platforms');
+    
+    const choice = await this.question('\nSelect platform (1-3): ');
+    
+    switch (choice) {
+      case '1':
+        return 'android';
+      case '2':
+        return 'ios';
+      case '3':
+        return 'both';
+      default:
+        console.log('⚠️  Invalid choice. Using Android.');
+        return 'android';
+    }
+  }
+
+  async getAppFilePath(platform) {
+    console.log('\n📁 App File Upload\n');
+    
+    if (platform === 'android' || platform === 'both') {
+      const androidPath = await this.question('Enter path to Android .apk file: ');
+      if (androidPath && fs.existsSync(androidPath)) {
+        return androidPath;
+      } else {
+        console.log('⚠️  APK file not found. Using sample app.');
+        return './sample-app.apk';
+      }
+    }
+    
+    if (platform === 'ios' || platform === 'both') {
+      const iosPath = await this.question('Enter path to iOS .ipa file: ');
+      if (iosPath && fs.existsSync(iosPath)) {
+        return iosPath;
+      } else {
+        console.log('⚠️  IPA file not found. Using sample app.');
+        return './sample-app.ipa';
+      }
+    }
+    
+    return './sample-app.apk';
+  }
+
+  async displayAppAnalysis(analysis) {
+    console.log('\n📊 App Analysis Results\n');
+    console.log(`Platform: ${analysis.platform}`);
+    console.log(`App Name: ${analysis.appName}`);
+    console.log(`Bundle ID: ${analysis.bundleId}`);
+    console.log(`Version: ${analysis.version}`);
+    console.log(`Total Elements: ${analysis.elements.length}`);
+    console.log(`Total Screens: ${analysis.screens.length}`);
+    
+    if (analysis.elements.length > 0) {
+      console.log('\n📱 Detected UI Elements:');
+      analysis.elements.slice(0, 5).forEach(element => {
+        console.log(`  - ${element.type}: ${element.id}`);
+      });
+      if (analysis.elements.length > 5) {
+        console.log(`  ... and ${analysis.elements.length - 5} more elements`);
+      }
+    }
+    
+    if (analysis.screens.length > 0) {
+      console.log('\n🖥️  Detected Screens:');
+      analysis.screens.forEach(screen => {
+        console.log(`  - ${screen.name}`);
+      });
+    }
   }
 
 

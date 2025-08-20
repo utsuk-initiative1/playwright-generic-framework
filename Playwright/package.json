@@ -12,7 +12,12 @@
     "start": "node enhanced-cli.js",
     "cli": "node enhanced-cli.js",
     "test": "echo \"No tests specified\" && exit 0",
-    "publish-github": "npm publish --registry=https://npm.pkg.github.com"
+    "publish-github": "npm publish --registry=https://npm.pkg.github.com",
+    "mobile:android": "npx wdio run ./mobile/config/wdio.android.conf.ts",
+    "mobile:ios": "npx wdio run ./mobile/config/wdio.ios.conf.ts",
+    "mobile:parallel": "npx wdio run ./mobile/config/wdio.parallel.conf.ts",
+    "appium:start": "appium",
+    "mobile:test": "npm run mobile:android && npm run mobile:ios"
   },
   "keywords": [
     "playwright",
@@ -24,12 +29,13 @@
     "typescript",
     "setup",
     "scaffold",
-
     "accessibility",
     "performance",
     "visual-testing",
     "mobile-testing",
-    "api-testing"
+    "api-testing",
+    "appium",
+    "mobile-automation"
   ],
   "author": "Utsuk Initiative",
   "license": "MIT",
@@ -62,6 +68,18 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@wdio/appium-service": "^8.32.0",
+    "@wdio/cli": "^8.32.0",
+    "@wdio/local-runner": "^8.32.0",
+    "@wdio/mocha-framework": "^8.32.0",
+    "@wdio/spec-reporter": "^8.32.0",
+    "@wdio/types": "^8.32.0",
+    "appium": "^2.2.0",
+    "appium-uiautomator2-driver": "^2.34.0",
+    "appium-xcuitest-driver": "^5.6.0",
+    "ts-node": "^10.9.0",
+    "wdio-appium-service": "^8.32.0",
+    "adm-zip": "^0.5.10"
   }
 }
