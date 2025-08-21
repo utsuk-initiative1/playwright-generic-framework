@@ -1,15 +1,18 @@
 {
-  "name": "playwright-framework-cli",
-  "version": "1.0.0",
-  "description": "CLI tool to quickly set up a comprehensive Playwright automation framework",
-  "main": "cli.js",
+  "name": "@utsuk-initiative1/playwright-framework-cli",
+  "version": "2.1.0",
+  "description": "A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, mobile testing, and advanced features",
+  "main": "enhanced-cli.js",
   "bin": {
-    "playwright-framework": "./cli.js",
-    "pw-framework": "./cli.js"
+    "playwright-framework": "./enhanced-cli.js",
+    "pw-framework": "./enhanced-cli.js",
+    "utsuk-playwright": "./enhanced-cli.js"
   },
   "scripts": {
-    "start": "node cli.js",
-    "test": "echo \"No tests specified\" && exit 0"
+    "start": "node enhanced-cli.js",
+    "cli": "node enhanced-cli.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "publish-github": "npm publish --registry=https://npm.pkg.github.com"
   },
   "keywords": [
     "playwright",
@@ -20,21 +23,58 @@
     "e2e",
     "typescript",
     "setup",
-    "scaffold"
+    "scaffold",
+    "accessibility",
+    "performance",
+    "visual-testing",
+    "mobile-testing",
+    "api-testing",
+    "appium",
+    "mobile-automation"
   ],
-  "author": "Your Name",
+  "author": "Utsuk Initiative",
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/playwright-framework-cli.git"
+    "url": "https://github.com/utsuk-initiative1/playwright-generic-framework.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/playwright-framework-cli/issues"
+    "url": "https://github.com/utsuk-initiative1/playwright-generic-framework/issues"
   },
-  "homepage": "https://github.com/yourusername/playwright-framework-cli#readme",
-  "dependencies": {},
-  "devDependencies": {}
+  "homepage": "https://github.com/utsuk-initiative1/playwright-generic-framework#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "enhanced-cli.js",
+    "run-enhanced-cli.js",
+    "cli-templates/",
+    "ENHANCED_CLI_README.md",
+    "README.md",
+    "CLI_README.md",
+    "QUICK_START.md"
+  ],
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "@wdio/appium-service": "^8.32.0",
+    "@wdio/cli": "^8.32.0",
+    "@wdio/local-runner": "^8.32.0",
+    "@wdio/mocha-framework": "^8.32.0",
+    "@wdio/spec-reporter": "^8.32.0",
+    "@wdio/types": "^8.32.0",
+    "appium": "^2.2.0",
+    "appium-uiautomator2-driver": "^2.34.0",
+    "appium-xcuitest-driver": "^5.6.0",
+    "ts-node": "^10.9.0",
+    "wdio-appium-service": "^8.32.0",
+    "adm-zip": "^0.5.10"
+  }
 } 

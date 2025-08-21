@@ -1,7 +1,7 @@
 {
   "name": "@utsuk-initiative1/playwright-framework-cli",
-  "version": "1.0.0",
-  "description": "A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, and advanced features",
+  "version": "2.1.1",
+  "description": "A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, mobile testing, and advanced features",
   "main": "enhanced-cli.js",
   "bin": {
     "playwright-framework": "./enhanced-cli.js",
@@ -12,12 +12,7 @@
     "start": "node enhanced-cli.js",
     "cli": "node enhanced-cli.js",
     "test": "echo \"No tests specified\" && exit 0",
-    "publish-github": "npm publish --registry=https://npm.pkg.github.com",
-    "mobile:android": "npx wdio run ./mobile/config/wdio.android.conf.ts",
-    "mobile:ios": "npx wdio run ./mobile/config/wdio.ios.conf.ts",
-    "mobile:parallel": "npx wdio run ./mobile/config/wdio.parallel.conf.ts",
-    "appium:start": "appium",
-    "mobile:test": "npm run mobile:android && npm run mobile:ios"
+    "publish-github": "npm publish --registry=https://npm.pkg.github.com"
   },
   "keywords": [
     "playwright",

@@ -1,0 +1,76 @@
+{
+  "name": "mobile-automation-framework",
+  "version": "1.0.0",
+  "description": "Mobile automation framework using Appium and WebDriverIO",
+  "main": "index.js",
+  "scripts": {
+    "mobile:android": "wdio config/wdio.android.conf.ts",
+    "mobile:ios": "wdio config/wdio.ios.conf.ts",
+    "mobile:parallel": "wdio config/wdio.parallel.conf.ts",
+    "mobile:test": "npm run mobile:parallel",
+    "mobile:smoke": "wdio config/wdio.android.conf.ts --spec tests/smoke/*.spec.ts",
+    "mobile:regression": "wdio config/wdio.parallel.conf.ts --spec tests/regression/*.spec.ts",
+    "mobile:login": "wdio config/wdio.android.conf.ts --spec tests/mobile-login.spec.ts",
+    "mobile:dashboard": "wdio config/wdio.android.conf.ts --spec tests/mobile-dashboard.spec.ts",
+    "mobile:profile": "wdio config/wdio.android.conf.ts --spec tests/mobile-profile.spec.ts",
+    "mobile:setup": "./setup-mobile.sh",
+    "mobile:install": "npm install && appium driver install uiautomator2 && appium driver install xcuitest",
+    "mobile:clean": "rm -rf node_modules package-lock.json",
+    "mobile:report": "allure generate allure-results --clean && allure open",
+    "mobile:report:serve": "allure serve allure-results",
+    "mobile:lint": "eslint . --ext .ts",
+    "mobile:lint:fix": "eslint . --ext .ts --fix",
+    "mobile:type-check": "tsc --noEmit",
+    "mobile:build": "tsc",
+    "mobile:dev": "nodemon --exec 'npm run mobile:test'",
+    "mobile:debug": "wdio config/wdio.android.conf.ts --debug"
+  },
+  "keywords": [
+    "mobile",
+    "automation",
+    "appium",
+    "webdriverio",
+    "android",
+    "ios",
+    "testing"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@wdio/allure-reporter": "^8.32.5",
+    "@wdio/appium-service": "^8.32.5",
+    "@wdio/cli": "^8.32.5",
+    "@wdio/local-runner": "^8.32.5",
+    "@wdio/mocha-framework": "^8.32.5",
+    "@wdio/spec-reporter": "^8.32.5",
+    "@wdio/types": "^8.32.5",
+    "appium": "^2.2.3",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "webdriverio": "^8.32.5"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.5",
+    "allure-commandline": "^2.24.1",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mobile-automation-framework.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/mobile-automation-framework/issues"
+  },
+  "homepage": "https://github.com/yourusername/mobile-automation-framework#readme"
+}

@@ -159,6 +159,43 @@ class EnhancedPlaywrightCLI {
       console.log(`🗑️  Removed existing directory: ${fullProjectPath}`);
     }
     
+    // Application Type Selection
+    console.log('\n🌐 Application Type Selection\n');
+    console.log('1. 🌐 Web Application');
+    console.log('2. 📱 Mobile Application');
+    console.log('3. 🔄 Hybrid (Web + Mobile)');
+    
+    const appType = await this.question('\nSelect application type (1-3): ');
+    
+    switch (appType) {
+      case '1':
+        this.config.applicationType = 'web';
+        await this.configureWebApplication();
+        break;
+      case '2':
+        this.config.applicationType = 'mobile';
+        await this.configureMobileApplication();
+        break;
+      case '3':
+        this.config.applicationType = 'hybrid';
+        await this.configureHybridApplication();
+        break;
+      default:
+        console.log('⚠️  Invalid choice. Defaulting to Web Application.');
+        this.config.applicationType = 'web';
+        await this.configureWebApplication();
+    }
+    
+    const environments = await this.question('Enter environments to configure (comma-separated, default: local,staging,production): ') || 'local,staging,production';
+    this.config.environments = environments.split(',').map(env => env.trim());
+    
+    console.log('\n✅ Project details captured!\n');
+    console.log(`📁 Project will be created at: ${fullProjectPath}\n`);
+  }
+
+  async configureWebApplication() {
+    console.log('\n🌐 Web Application Configuration\n');
+    
     this.config.baseURL = await this.question('Enter your application base URL (default: https://example.com): ') || 'https://example.com';
     
     // Validate URL
@@ -169,45 +206,250 @@ class EnhancedPlaywrightCLI {
     
     this.config.apiURL = await this.question('Enter your API base URL (default: https://api.example.com): ') || 'https://api.example.com';
     
-    const environments = await this.question('Enter environments to configure (comma-separated, default: local,staging,production): ') || 'local,staging,production';
-    this.config.environments = environments.split(',').map(env => env.trim());
+    // Web-specific features
+    const enableResponsive = await this.question('Enable responsive testing for mobile/tablet devices? (y/n, default: y): ') || 'y';
+    this.config.responsiveTesting = enableResponsive.toLowerCase() === 'y';
     
-    console.log('\n✅ Project details captured!\n');
-    console.log(`📁 Project will be created at: ${fullProjectPath}\n`);
+    const enableCrossBrowser = await this.question('Enable cross-browser testing (Chrome, Firefox, Safari)? (y/n, default: y): ') || 'y';
+    this.config.crossBrowserTesting = enableCrossBrowser.toLowerCase() === 'y';
+    
+    console.log('✅ Web application configuration completed!');
+  }
+
+  async configureMobileApplication() {
+    console.log('\n📱 Mobile Application Configuration\n');
+    
+    // Mobile platform selection
+    console.log('Select mobile platform:');
+    console.log('1. 🤖 Android');
+    console.log('2. 🍎 iOS');
+    console.log('3. 🔄 Both (Android + iOS)');
+    
+    const platform = await this.question('\nSelect platform (1-3): ');
+    
+    switch (platform) {
+      case '1':
+        this.config.mobilePlatform = 'android';
+        break;
+      case '2':
+        this.config.mobilePlatform = 'ios';
+        break;
+      case '3':
+        this.config.mobilePlatform = 'both';
+        break;
+      default:
+        console.log('⚠️  Invalid choice. Defaulting to Android.');
+        this.config.mobilePlatform = 'android';
+    }
+    
+    // App file upload prompts
+    if (this.config.mobilePlatform === 'android' || this.config.mobilePlatform === 'both') {
+      console.log('\n🤖 Android Configuration');
+      const androidAppPath = await this.question('Enter path to your Android .apk file (or press Enter to skip): ');
+      if (androidAppPath && androidAppPath.trim()) {
+        this.config.androidAppPath = androidAppPath.trim();
+        if (!fs.existsSync(this.config.androidAppPath)) {
+          console.log('⚠️  APK file not found. Please ensure the path is correct.');
+        } else {
+          console.log('✅ Android APK file found!');
+        }
+      }
+    }
+    
+    if (this.config.mobilePlatform === 'ios' || this.config.mobilePlatform === 'both') {
+      console.log('\n🍎 iOS Configuration');
+      const iosAppPath = await this.question('Enter path to your iOS .ipa file (or press Enter to skip): ');
+      if (iosAppPath && iosAppPath.trim()) {
+        this.config.iosAppPath = iosAppPath.trim();
+        if (!fs.existsSync(this.config.iosAppPath)) {
+          console.log('⚠️  IPA file not found. Please ensure the path is correct.');
+        } else {
+          console.log('✅ iOS IPA file found!');
+        }
+      }
+    }
+    
+    // Mobile-specific features
+    const enableRealDevices = await this.question('Enable real device testing? (y/n, default: n): ') || 'n';
+    this.config.realDeviceTesting = enableRealDevices.toLowerCase() === 'y';
+    
+    const enableEmulator = await this.question('Enable emulator/simulator testing? (y/n, default: y): ') || 'y';
+    this.config.emulatorTesting = enableEmulator.toLowerCase() === 'y';
+    
+    console.log('✅ Mobile application configuration completed!');
+  }
+
+  async configureHybridApplication() {
+    console.log('\n🔄 Hybrid Application Configuration\n');
+    
+    // Configure web part
+    console.log('🌐 Web Application Settings:');
+    this.config.baseURL = await this.question('Enter your web application base URL (default: https://example.com): ') || 'https://example.com';
+    
+    if (!this.isValidUrl(this.config.baseURL)) {
+      console.log('⚠️  Invalid URL format. Please enter a valid URL.');
+      this.config.baseURL = await this.question('Enter valid base URL: ');
+    }
+    
+    this.config.apiURL = await this.question('Enter your API base URL (default: https://api.example.com): ') || 'https://api.example.com';
+    
+    // Configure mobile part
+    console.log('\n📱 Mobile Application Settings:');
+    console.log('Select mobile platform:');
+    console.log('1. 🤖 Android');
+    console.log('2. 🍎 iOS');
+    console.log('3. 🔄 Both (Android + iOS)');
+    
+    const platform = await this.question('\nSelect platform (1-3): ');
+    
+    switch (platform) {
+      case '1':
+        this.config.mobilePlatform = 'android';
+        break;
+      case '2':
+        this.config.mobilePlatform = 'ios';
+        break;
+      case '3':
+        this.config.mobilePlatform = 'both';
+        break;
+      default:
+        console.log('⚠️  Invalid choice. Defaulting to Android.');
+        this.config.mobilePlatform = 'android';
+    }
+    
+    // App file upload prompts for hybrid
+    if (this.config.mobilePlatform === 'android' || this.config.mobilePlatform === 'both') {
+      const androidAppPath = await this.question('Enter path to your Android .apk file (or press Enter to skip): ');
+      if (androidAppPath && androidAppPath.trim()) {
+        this.config.androidAppPath = androidAppPath.trim();
+      }
+    }
+    
+    if (this.config.mobilePlatform === 'ios' || this.config.mobilePlatform === 'both') {
+      const iosAppPath = await this.question('Enter path to your iOS .ipa file (or press Enter to skip): ');
+      if (iosAppPath && iosAppPath.trim()) {
+        this.config.iosAppPath = iosAppPath.trim();
+      }
+    }
+    
+    console.log('✅ Hybrid application configuration completed!');
   }
 
   async selectFrameworkTemplate() {
     console.log('📋 Select Framework Template\n');
-    console.log('1. 🎯 Basic (Essential features only)');
-    console.log('2. 🚀 Standard (Recommended - Full features)');
-    console.log('3. 🏢 Enterprise (Advanced features + CI/CD)');
-    console.log('4. 📱 Mobile-First (Mobile testing focused)');
-    console.log('5. 🔧 Custom (Choose your features)');
     
-    const template = await this.question('\nSelect template (1-5): ');
-    
-    switch (template) {
-      case '1':
-        this.features = this.getBasicTemplate();
-        break;
-      case '2':
-        this.features = this.getStandardTemplate();
-        break;
-      case '3':
-        this.features = this.getEnterpriseTemplate();
-        break;
-      case '4':
-        this.features = this.getMobileTemplate();
-        break;
-      case '5':
-        await this.selectCustomFeatures();
-        break;
-      default:
-        console.log('⚠️  Invalid choice. Using Standard template.');
-        this.features = this.getStandardTemplate();
+    // Show intelligent template suggestions based on application type
+    if (this.config.applicationType === 'mobile') {
+      console.log('📱 Mobile Application Templates:');
+      console.log('1. 📱 Mobile-Basic (Essential mobile features)');
+      console.log('2. 📱 Mobile-Standard (Full mobile testing suite)');
+      console.log('3. 📱 Mobile-Enterprise (Advanced mobile + CI/CD)');
+      console.log('4. 🔧 Custom (Choose your features)');
+      
+      const template = await this.question('\nSelect template (1-4): ');
+      
+      switch (template) {
+        case '1':
+          this.features = this.getMobileBasicTemplate();
+          break;
+        case '2':
+          this.features = this.getMobileStandardTemplate();
+          break;
+        case '3':
+          this.features = this.getMobileEnterpriseTemplate();
+          break;
+        case '4':
+          await this.selectCustomFeatures();
+          break;
+        default:
+          console.log('⚠️  Invalid choice. Using Mobile-Standard template.');
+          this.features = this.getMobileStandardTemplate();
+      }
+    } else if (this.config.applicationType === 'web') {
+      console.log('🌐 Web Application Templates:');
+      console.log('1. 🎯 Web-Basic (Essential web features)');
+      console.log('2. 🚀 Web-Standard (Full web testing suite)');
+      console.log('3. 🏢 Web-Enterprise (Advanced web + CI/CD)');
+      console.log('4. 🔧 Custom (Choose your features)');
+      
+      const template = await this.question('\nSelect template (1-4): ');
+      
+      switch (template) {
+        case '1':
+          this.features = this.getWebBasicTemplate();
+          break;
+        case '2':
+          this.features = this.getWebStandardTemplate();
+          break;
+        case '3':
+          this.features = this.getWebEnterpriseTemplate();
+          break;
+        case '4':
+          await this.selectCustomFeatures();
+          break;
+        default:
+          console.log('⚠️  Invalid choice. Using Web-Standard template.');
+          this.features = this.getWebStandardTemplate();
+      }
+    } else if (this.config.applicationType === 'hybrid') {
+      console.log('🔄 Hybrid Application Templates:');
+      console.log('1. 🔄 Hybrid-Basic (Essential web + mobile features)');
+      console.log('2. 🔄 Hybrid-Standard (Full web + mobile testing suite)');
+      console.log('3. 🔄 Hybrid-Enterprise (Advanced hybrid + CI/CD)');
+      console.log('4. 🔧 Custom (Choose your features)');
+      
+      const template = await this.question('\nSelect template (1-4): ');
+      
+      switch (template) {
+        case '1':
+          this.features = this.getHybridBasicTemplate();
+          break;
+        case '2':
+          this.features = this.getHybridStandardTemplate();
+          break;
+        case '3':
+          this.features = this.getHybridEnterpriseTemplate();
+          break;
+        case '4':
+          await this.selectCustomFeatures();
+          break;
+        default:
+          console.log('⚠️  Invalid choice. Using Hybrid-Standard template.');
+          this.features = this.getHybridStandardTemplate();
+      }
+    } else {
+      // Fallback to original templates
+      console.log('1. 🎯 Basic (Essential features only)');
+      console.log('2. 🚀 Standard (Recommended - Full features)');
+      console.log('3. 🏢 Enterprise (Advanced features + CI/CD)');
+      console.log('4. 📱 Mobile-First (Mobile testing focused)');
+      console.log('5. 🔧 Custom (Choose your features)');
+      
+      const template = await this.question('\nSelect template (1-5): ');
+      
+      switch (template) {
+        case '1':
+          this.features = this.getBasicTemplate();
+          break;
+        case '2':
+          this.features = this.getStandardTemplate();
+          break;
+        case '3':
+          this.features = this.getEnterpriseTemplate();
+          break;
+        case '4':
+          this.features = this.getMobileTemplate();
+          break;
+        case '5':
+          await this.selectCustomFeatures();
+          break;
+        default:
+          console.log('⚠️  Invalid choice. Using Standard template.');
+          this.features = this.getStandardTemplate();
+      }
     }
     
-    console.log(`\n✅ Template selected: ${this.getTemplateName(template)}\n`);
+    console.log(`\n✅ Template selected: ${this.getTemplateName(template || '2')}\n`);
   }
 
   async selectCustomFeatures() {
@@ -322,7 +564,209 @@ class EnhancedPlaywrightCLI {
       '4': 'Mobile-First',
       '5': 'Custom'
     };
+    
+    // Handle application-specific templates
+    if (this.config.applicationType === 'mobile') {
+      const mobileNames = {
+        '1': 'Mobile-Basic',
+        '2': 'Mobile-Standard',
+        '3': 'Mobile-Enterprise',
+        '4': 'Custom'
+      };
+      return mobileNames[template] || 'Mobile-Standard';
+    } else if (this.config.applicationType === 'web') {
+      const webNames = {
+        '1': 'Web-Basic',
+        '2': 'Web-Standard',
+        '3': 'Web-Enterprise',
+        '4': 'Custom'
+      };
+      return webNames[template] || 'Web-Standard';
+    } else if (this.config.applicationType === 'hybrid') {
+      const hybridNames = {
+        '1': 'Hybrid-Basic',
+        '2': 'Hybrid-Standard',
+        '3': 'Hybrid-Enterprise',
+        '4': 'Custom'
+      };
+      return hybridNames[template] || 'Hybrid-Standard';
+    }
+    
     return names[template] || 'Standard';
+  }
+
+  // Web Application Templates
+  getWebBasicTemplate() {
+    return {
+      'api-testing': false,
+      'visual-testing': true,
+      'performance-testing': false,
+      'accessibility-testing': false,
+      'mobile-testing': false,
+      'ci-cd-templates': false,
+      'docker-support': false,
+      'cloud-testing': false,
+      'reporting-dashboard': false,
+      'test-generator': false,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getWebStandardTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': true,
+      'performance-testing': false,
+      'accessibility-testing': true,
+      'mobile-testing': false,
+      'ci-cd-templates': true,
+      'docker-support': false,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': false,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getWebEnterpriseTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': true,
+      'performance-testing': true,
+      'accessibility-testing': true,
+      'mobile-testing': false,
+      'ci-cd-templates': true,
+      'docker-support': true,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': true,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  // Mobile Application Templates
+  getMobileBasicTemplate() {
+    return {
+      'api-testing': false,
+      'visual-testing': true,
+      'performance-testing': false,
+      'accessibility-testing': true,
+      'mobile-testing': true,
+      'ci-cd-templates': false,
+      'docker-support': false,
+      'cloud-testing': false,
+      'reporting-dashboard': false,
+      'test-generator': false,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getMobileStandardTemplate() {
+    return {
+      'api-testing': false,
+      'visual-testing': true,
+      'performance-testing': false,
+      'accessibility-testing': true,
+      'mobile-testing': true,
+      'ci-cd-templates': true,
+      'docker-support': false,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': false,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getMobileEnterpriseTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': true,
+      'performance-testing': true,
+      'accessibility-testing': true,
+      'mobile-testing': true,
+      'ci-cd-templates': true,
+      'docker-support': true,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': true,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  // Hybrid Application Templates
+  getHybridBasicTemplate() {
+    return {
+      'api-testing': false,
+      'visual-testing': true,
+      'performance-testing': false,
+      'accessibility-testing': true,
+      'mobile-testing': true,
+      'ci-cd-templates': false,
+      'docker-support': false,
+      'cloud-testing': false,
+      'reporting-dashboard': false,
+      'test-generator': false,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getHybridStandardTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': true,
+      'performance-testing': false,
+      'accessibility-testing': true,
+      'mobile-testing': true,
+      'ci-cd-templates': true,
+      'docker-support': false,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': false,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getHybridEnterpriseTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': true,
+      'performance-testing': true,
+      'accessibility-testing': true,
+      'mobile-testing': true,
+      'ci-cd-templates': true,
+      'docker-support': true,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': true,
+      'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
   }
 
   async setupMobileAutomation() {
@@ -469,11 +913,59 @@ class EnhancedPlaywrightCLI {
       'data'
     ];
 
+    // Add mobile-specific directories if mobile testing is enabled
+    if (this.config.applicationType === 'mobile' || this.config.applicationType === 'hybrid' || this.features['mobile-testing']) {
+      directories.push(
+        'mobile/config',
+        'mobile/core',
+        'mobile/pages',
+        'mobile/tests',
+        'mobile/utils',
+        'mobile/setup',
+        'apps'
+      );
+    }
+
     for (const dir of directories) {
       await this.createDirectory(path.join(fullProjectPath, dir));
     }
     
     console.log('\n✅ Project structure created!\n');
+    
+    // Copy mobile app files if they exist
+    if (this.config.applicationType === 'mobile' || this.config.applicationType === 'hybrid') {
+      await this.copyMobileAppFiles(fullProjectPath);
+    }
+  }
+
+  async copyMobileAppFiles(projectPath) {
+    console.log('📱 Copying mobile app files...\n');
+    
+    const appsDir = path.join(projectPath, 'apps');
+    
+    // Copy Android APK if specified
+    if (this.config.androidAppPath && fs.existsSync(this.config.androidAppPath)) {
+      const androidDestPath = path.join(appsDir, path.basename(this.config.androidAppPath));
+      try {
+        fs.copyFileSync(this.config.androidAppPath, androidDestPath);
+        console.log(`✅ Copied Android APK: ${path.basename(this.config.androidAppPath)}`);
+      } catch (error) {
+        console.log(`⚠️  Failed to copy Android APK: ${error.message}`);
+      }
+    }
+    
+    // Copy iOS IPA if specified
+    if (this.config.iosAppPath && fs.existsSync(this.config.iosAppPath)) {
+      const iosDestPath = path.join(appsDir, path.basename(this.config.iosAppPath));
+      try {
+        fs.copyFileSync(this.config.iosAppPath, iosDestPath);
+        console.log(`✅ Copied iOS IPA: ${path.basename(this.config.iosAppPath)}`);
+      } catch (error) {
+        console.log(`⚠️  Failed to copy iOS IPA: ${error.message}`);
+      }
+    }
+    
+    console.log('✅ Mobile app files copied!\n');
   }
 
   // Helper to get the full path inside the project
@@ -875,7 +1367,41 @@ class EnhancedPlaywrightCLI {
     this.createFile('playwright.config.ts', playwrightConfigContent);
     console.log('✅ playwright.config.ts created');
 
+    // Create mobile configuration files if mobile testing is enabled
+    if (this.config.applicationType === 'mobile' || this.config.applicationType === 'hybrid' || this.features['mobile-testing']) {
+      await this.createMobileConfiguration();
+    }
+
     console.log('\n✅ Environment configuration completed!\n');
+  }
+
+  async createMobileConfiguration() {
+    console.log('📱 Creating mobile configuration...\n');
+    
+    // Create mobile environment config
+    const mobileEnvConfigContent = this.generateMobileEnvironmentConfig();
+    this.createFile('mobile/config/EnvironmentConfig.ts', mobileEnvConfigContent);
+    console.log('✅ Mobile EnvironmentConfig.ts created');
+
+    // Create WebDriverIO configs
+    if (this.config.mobilePlatform === 'android' || this.config.mobilePlatform === 'both') {
+      const androidConfigContent = this.generateAndroidConfig();
+      this.createFile('mobile/config/wdio.android.conf.ts', androidConfigContent);
+      console.log('✅ Android WebDriverIO config created');
+    }
+
+    if (this.config.mobilePlatform === 'ios' || this.config.mobilePlatform === 'both') {
+      const iosConfigContent = this.generateIOSConfig();
+      this.createFile('mobile/config/wdio.ios.conf.ts', iosConfigContent);
+      console.log('✅ iOS WebDriverIO config created');
+    }
+
+    // Create parallel config
+    const parallelConfigContent = this.generateParallelConfig();
+    this.createFile('mobile/config/wdio.parallel.conf.ts', parallelConfigContent);
+    console.log('✅ Parallel WebDriverIO config created');
+
+    console.log('✅ Mobile configuration completed!\n');
   }
 
   async createSampleTests() {

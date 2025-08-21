@@ -1,6 +1,6 @@
-# Mobile Automation with Appium
+# Mobile Automation Framework
 
-This directory contains the mobile automation framework that integrates Appium with your existing Playwright framework. It provides comprehensive mobile testing capabilities for both Android and iOS platforms.
+A comprehensive mobile automation framework built with Appium, WebDriverIO, and TypeScript. This framework provides robust testing capabilities for both Android and iOS mobile applications.
 
 ## 🚀 Features
 
@@ -13,8 +13,11 @@ This directory contains the mobile automation framework that integrates Appium w
 - **Screenshot and recording**: Visual verification capabilities
 - **Performance monitoring**: Device performance data collection
 - **Network simulation**: Test different network conditions
+- **Comprehensive assertions**: Mobile-specific assertion utilities
+- **Test reporting**: Allure reports with detailed test results
+- **CI/CD integration**: Ready for continuous integration
 
-## 📁 Directory Structure
+## 📁 Enhanced Directory Structure
 
 ```
 mobile/
@@ -23,15 +26,23 @@ mobile/
 │   ├── wdio.ios.conf.ts
 │   └── wdio.parallel.conf.ts
 ├── core/                   # Base classes
-│   └── BaseMobilePage.ts
+│   ├── BaseMobilePage.ts
+│   └── MobileTestBase.ts
 ├── pages/                  # Page Object Models
-│   └── MobileLoginPage.ts
+│   ├── MobileLoginPage.ts
+│   ├── MobileDashboardPage.ts
+│   └── MobileProfilePage.ts
 ├── tests/                  # Test specifications
-│   └── mobile-login.spec.ts
+│   ├── mobile-login.spec.ts
+│   ├── mobile-dashboard.spec.ts
+│   └── mobile-profile.spec.ts
 ├── utils/                  # Utility classes
-│   └── MobileUtilities.ts
+│   ├── MobileUtilities.ts
+│   └── MobileAssertionUtils.ts
 ├── setup/                  # Setup and teardown
 │   └── mobile-setup.ts
+├── package.json            # Mobile-specific dependencies
+├── tsconfig.json          # TypeScript configuration
 └── README.md
 ```
 
@@ -85,126 +96,280 @@ appium driver list
 
 ## 📦 Installation
 
-1. **Install dependencies**:
+1. **Navigate to mobile directory**:
 ```bash
-cd Playwright
+cd Playwright/mobile
+```
+
+2. **Install dependencies**:
+```bash
 npm install
 ```
 
-2. **Install Appium drivers**:
+3. **Install Appium drivers**:
 ```bash
 appium driver install uiautomator2
 appium driver install xcuitest
 ```
 
-3. **Set up environment variables**:
+4. **Set up environment variables**:
 ```bash
 # Create .env file
-cp env.example .env
+cp ../env.example .env
 
-# Add your app paths
-ANDROID_APP_PATH=./apps/your-app.apk
-IOS_APP_PATH=./apps/your-app.app
+# Update with your app paths
+ANDROID_APP_PATH=./apps/your-android-app.apk
+IOS_APP_PATH=./apps/your-ios-app.app
 ```
 
-## 🏃‍♂️ Running Tests
+## 🧪 Running Tests
 
-### Android Tests
+### Basic Test Execution
+
 ```bash
 # Run Android tests
 npm run mobile:android
 
-# Run with specific app
-ANDROID_APP_PATH=./apps/my-app.apk npm run mobile:android
-```
-
-### iOS Tests
-```bash
-# Run iOS tests
+# Run iOS tests (macOS only)
 npm run mobile:ios
 
-# Run with specific app
-IOS_APP_PATH=./apps/my-app.app npm run mobile:ios
-```
-
-### Parallel Execution
-```bash
-# Run tests on both platforms simultaneously
+# Run tests in parallel
 npm run mobile:parallel
-```
 
-### All Mobile Tests
-```bash
-# Run all mobile tests sequentially
+# Run all tests
 npm run mobile:test
 ```
 
+### Specific Test Suites
+
+```bash
+# Run login tests
+npm run mobile:login
+
+# Run dashboard tests
+npm run mobile:dashboard
+
+# Run profile tests
+npm run mobile:profile
+
+# Run smoke tests
+npm run mobile:smoke
+
+# Run regression tests
+npm run mobile:regression
+```
+
+### Development and Debugging
+
+```bash
+# Run in debug mode
+npm run mobile:debug
+
+# Watch mode for development
+npm run mobile:dev
+
+# Type checking
+npm run mobile:type-check
+
+# Linting
+npm run mobile:lint
+npm run mobile:lint:fix
+```
+
+## 📱 Framework Components
+
+### Core Classes
+
+#### MobileTestBase
+Provides common setup and teardown functionality for mobile tests:
+- App permissions handling
+- Device state management
+- Network condition simulation
+- Performance monitoring
+- Device interaction utilities
+
+#### BaseMobilePage
+Base class for all page objects with common mobile interactions:
+- Element waiting and interaction
+- Gesture support (swipe, tap, long press)
+- Screenshot capabilities
+- Device orientation management
+- Keyboard handling
+
+### Page Objects
+
+#### MobileLoginPage
+Comprehensive login functionality with platform-specific locators:
+- Login with valid/invalid credentials
+- Form validation
+- Error message handling
+- Biometric authentication support
+- Permission handling
+
+#### MobileDashboardPage
+Dashboard functionality testing:
+- Navigation verification
+- Quick actions testing
+- Bottom navigation
+- Performance metrics
+- Pull-to-refresh functionality
+
+#### MobileProfilePage
+Profile management testing:
+- Profile information display
+- Profile editing
+- Image management
+- Validation testing
+- Navigation testing
+
+### Utility Classes
+
+#### MobileAssertionUtils
+Comprehensive assertion utilities for mobile testing:
+- Element visibility and state assertions
+- Performance assertions
+- Device state assertions
+- Network and battery assertions
+- Screenshot comparison
+
+#### MobileUtilities
+General mobile testing utilities:
+- Device management
+- Network simulation
+- Performance monitoring
+- Log collection
+- App state management
+
 ## 🔧 Configuration
 
-### Android Configuration
-```typescript
-// mobile/config/wdio.android.conf.ts
-capabilities: [{
-  platformName: 'Android',
-  'appium:automationName': 'UiAutomator2',
-  'appium:deviceName': 'Android Emulator',
-  'appium:platformVersion': '13.0',
-  'appium:app': process.env.ANDROID_APP_PATH || './apps/app-debug.apk',
-  'appium:autoGrantPermissions': true,
-  'appium:noReset': false
-}]
+### WebDriverIO Configurations
+
+#### Android Configuration (`wdio.android.conf.ts`)
+- UiAutomator2 automation
+- Android emulator setup
+- Permission handling
+- Timeout configurations
+
+#### iOS Configuration (`wdio.ios.conf.ts`)
+- XCUITest automation
+- iOS simulator setup
+- Alert handling
+- WebDriverAgent configuration
+
+#### Parallel Configuration (`wdio.parallel.conf.ts`)
+- Multi-device testing
+- Cross-platform execution
+- Allure reporting
+- Failure handling
+
+### Environment Variables
+
+```bash
+# App paths
+ANDROID_APP_PATH=./apps/your-android-app.apk
+IOS_APP_PATH=./apps/your-ios-app.app
+
+# Device UDIDs
+ANDROID_UDID_1=emulator-5554
+ANDROID_UDID_2=emulator-5556
+IOS_UDID_1=simulator-1
+IOS_UDID_2=simulator-2
+
+# Appium settings
+APPIUM_HOST=127.0.0.1
+APPIUM_PORT=4723
 ```
 
-### iOS Configuration
-```typescript
-// mobile/config/wdio.ios.conf.ts
-capabilities: [{
-  platformName: 'iOS',
-  'appium:automationName': 'XCUITest',
-  'appium:deviceName': 'iPhone Simulator',
-  'appium:platformVersion': '16.0',
-  'appium:app': process.env.IOS_APP_PATH || './apps/YourApp.app',
-  'appium:autoAcceptAlerts': true
-}]
+## 📊 Test Reporting
+
+### Allure Reports
+
+```bash
+# Generate and open reports
+npm run mobile:report
+
+# Serve reports locally
+npm run mobile:report:serve
 ```
 
-## 📱 Page Object Model
+### Screenshots
 
-### Base Mobile Page
-```typescript
-import { BaseMobilePage } from '../core/BaseMobilePage';
+Screenshots are automatically captured:
+- On test failures
+- On explicit screenshot calls
+- For visual regression testing
 
-export class MyMobilePage extends BaseMobilePage {
-  // Platform-specific locators
-  private readonly androidElement = '~android_element';
-  private readonly iosElement = '-ios predicate string:type == "XCUIElementTypeButton"';
+## 🚀 Advanced Features
 
-  async performAction(): Promise<void> {
-    const locators = await this.getLocators();
-    await this.clickElement(locators.element);
-  }
-}
+### Parallel Testing
+
+Run tests across multiple devices simultaneously:
+```bash
+npm run mobile:parallel
 ```
 
-### Platform-Specific Locators
-```typescript
-// Android locators
-private readonly androidEmailInput = '~email_input, #email, [resource-id="email"]';
+### Network Simulation
 
-// iOS locators
-private readonly iosEmailInput = '-ios predicate string:type == "XCUIElementTypeTextField" AND name == "email"';
+Test app behavior under different network conditions:
+```typescript
+await testBase.setNetworkConditions({
+  offline: false,
+  latency: 1000,
+  downloadThroughput: 1000000,
+  uploadThroughput: 1000000
+});
 ```
 
-## 🎯 Test Examples
+### Performance Testing
 
-### Basic Login Test
+Monitor app performance during tests:
 ```typescript
+const metrics = await testBase.getPerformanceMetrics();
+expect(metrics.loadTime).to.be.lessThan(5000);
+```
+
+### Device Interaction
+
+Test device-specific features:
+```typescript
+// Rotate device
+await testBase.rotateDevice('LANDSCAPE');
+
+// Lock/unlock device
+await testBase.lockDevice();
+await testBase.unlockDevice();
+
+// Shake device
+await testBase.shakeDevice();
+```
+
+## 🔍 Writing Tests
+
+### Basic Test Structure
+
+```typescript
+import { describe, it, before, after } from 'mocha';
+import { expect } from 'chai';
+import { MobileTestBase } from '../core/MobileTestBase';
+import { MobileLoginPage } from '../pages/MobileLoginPage';
+
 describe('Mobile Login Tests', () => {
-  it('should successfully login', async () => {
-    const loginPage = new MobileLoginPage(driver);
-    
+  let testBase: MobileTestBase;
+  let loginPage: MobileLoginPage;
+
+  before(async () => {
+    testBase = new MobileTestBase(driver);
+    loginPage = new MobileLoginPage(driver);
+    await testBase.setup();
+  });
+
+  after(async () => {
+    await testBase.teardown();
+  });
+
+  it('should login successfully', async () => {
     await loginPage.navigateToLogin();
-    await loginPage.login('user@example.com', 'password');
+    await loginPage.login('test@example.com', 'password123');
     
     const isLoggedIn = await loginPage.verifyLoginSuccess();
     expect(isLoggedIn).to.be.true;
@@ -212,178 +377,62 @@ describe('Mobile Login Tests', () => {
 });
 ```
 
-### Gesture Testing
+### Using Assertions
+
 ```typescript
-it('should handle swipe gestures', async () => {
-  const page = new MyMobilePage(driver);
-  
-  await page.swipeUp();
-  await page.swipeDown();
-  await page.swipeLeft();
-  await page.swipeRight();
-});
+import { MobileAssertionUtils } from '../utils/MobileAssertionUtils';
+
+const assertions = new MobileAssertionUtils(driver);
+
+// Element assertions
+await assertions.assertElementVisible('~login_button');
+await assertions.assertElementText('~welcome_text', 'Welcome');
+
+// Performance assertions
+await assertions.assertPageLoadTime(5000);
+
+// Device assertions
+await assertions.assertDeviceOrientation('PORTRAIT');
+await assertions.assertNetworkConnected();
 ```
 
-### Device Interaction
-```typescript
-it('should change device orientation', async () => {
-  const page = new MyMobilePage(driver);
-  
-  await page.setOrientation('LANDSCAPE');
-  const orientation = await page.getOrientation();
-  expect(orientation).to.equal('LANDSCAPE');
-});
-```
-
-## 🛠️ Utilities
-
-### Mobile Utilities
-```typescript
-import { MobileUtilities } from '../utils/MobileUtilities';
-
-const utilities = new MobileUtilities(driver);
-
-// Device management
-await utilities.installApp('./apps/my-app.apk');
-await utilities.launchApp('com.example.app');
-
-// Network simulation
-await utilities.setNetworkConnection(0); // No network
-await utilities.setNetworkConnection(6); // All networks
-
-// Device control
-await utilities.lock();
-await utilities.unlock();
-await utilities.shake();
-```
-
-### Setup and Teardown
-```typescript
-import { MobileSetup } from '../setup/mobile-setup';
-
-const setup = new MobileSetup(driver);
-
-// Initialize environment
-await setup.initialize();
-
-// Validate environment
-const isValid = await setup.validateEnvironment();
-
-// Cleanup
-await setup.cleanup();
-```
-
-## 📊 Reporting
-
-### Screenshots
-```typescript
-// Take screenshot
-const screenshotPath = await page.takeScreenshot('test_name');
-```
-
-### Screen Recording
-```typescript
-// Start recording
-await setup.startTestRecording();
-
-// Stop recording
-const recordingPath = await setup.stopTestRecording();
-```
-
-### Device Logs
-```typescript
-// Get device logs
-const logs = await utilities.getDeviceLogs('syslog');
-```
-
-## 🔍 Debugging
-
-### Appium Inspector
-```bash
-# Start Appium with inspector
-appium --base-path /wd/hub
-
-# Open Appium Inspector in browser
-# http://localhost:4723/inspector
-```
-
-### Device Logs
-```bash
-# Android logs
-adb logcat
-
-# iOS logs
-xcrun simctl spawn booted log stream
-```
-
-### WebDriverIO Debug Mode
-```typescript
-// Enable debug logging
-logLevel: 'debug'
-```
-
-## 🚨 Troubleshooting
+## 🛠️ Troubleshooting
 
 ### Common Issues
 
-1. **Device not found**:
-   - Check device connection: `adb devices` or `xcrun simctl list devices`
-   - Verify device name in capabilities
+1. **Appium not starting**: Check if Appium is installed and drivers are available
+2. **Device not found**: Verify device UDID and connection
+3. **Element not found**: Check locator strategy and element availability
+4. **Permission issues**: Ensure app permissions are properly handled
 
-2. **App not installed**:
-   - Check app path in capabilities
-   - Verify app bundle ID
+### Debug Mode
 
-3. **Permission issues**:
-   - Enable `autoGrantPermissions` for Android
-   - Handle permission dialogs in setup
-
-4. **Network issues**:
-   - Check device network connection
-   - Verify Appium server is running
-
-### Environment Variables
+Run tests in debug mode for detailed logging:
 ```bash
-# Required environment variables
-ANDROID_HOME=/path/to/android/sdk
-ANDROID_APP_PATH=./apps/your-app.apk
-IOS_APP_PATH=./apps/your-app.app
+npm run mobile:debug
 ```
 
-## 📈 Best Practices
+### Logs
 
-1. **Use Page Object Model**: Keep locators and actions in page classes
-2. **Platform-specific locators**: Handle Android and iOS differences
-3. **Wait strategies**: Use explicit waits for better reliability
-4. **Error handling**: Implement proper error handling and recovery
-5. **Test data management**: Use fixtures for test data
-6. **Parallel execution**: Run tests on multiple devices for efficiency
-7. **Visual verification**: Use screenshots and recordings for validation
-
-## 🔗 Integration with Existing Framework
-
-The mobile automation framework integrates seamlessly with your existing Playwright framework:
-
-- **Shared utilities**: Common testing utilities
-- **Consistent patterns**: Same Page Object Model approach
-- **Unified reporting**: Combined test reports
-- **CI/CD integration**: Same pipeline structure
-
-## 📚 Additional Resources
-
-- [Appium Documentation](http://appium.io/docs/en/about-appium/intro/)
-- [WebDriverIO Documentation](https://webdriver.io/docs/)
-- [Android Testing Guide](https://developer.android.com/guide/topics/testing)
-- [iOS Testing Guide](https://developer.apple.com/documentation/xctest)
+Check logs in the `logs/` directory:
+- `appium.log`: Appium server logs
+- Test execution logs in console
 
 ## 🤝 Contributing
 
-1. Follow the existing code patterns
-2. Add platform-specific locators
-3. Include proper error handling
-4. Add comprehensive tests
-5. Update documentation
+1. Follow the existing code structure
+2. Add appropriate tests for new features
+3. Update documentation
+4. Ensure all tests pass
+5. Follow TypeScript best practices
 
 ## 📄 License
 
-This mobile automation framework is part of the Utsuk Initiative Playwright Framework and follows the same MIT license.
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+- Check the documentation
+- Review existing issues
+- Create a new issue with detailed information

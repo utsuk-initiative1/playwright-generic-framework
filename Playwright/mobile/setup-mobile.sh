@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Mobile Automation Setup Script
-# This script helps set up the mobile automation environment with Appium
+# Mobile Automation Framework Setup Script
+# This script sets up the complete mobile automation environment
 
 set -e
-
-echo "🚀 Setting up Mobile Automation with Appium..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -31,229 +29,322 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if Node.js is installed
-check_nodejs() {
-    print_status "Checking Node.js installation..."
-    if command -v node &> /dev/null; then
-        NODE_VERSION=$(node --version)
-        print_success "Node.js is installed: $NODE_VERSION"
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to check Node.js version
+check_node_version() {
+    if command_exists node; then
+        NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
+        if [ "$NODE_VERSION" -ge 16 ]; then
+            print_success "Node.js version $(node --version) is compatible"
+            return 0
+        else
+            print_error "Node.js version $(node --version) is too old. Please install Node.js 16 or higher."
+            return 1
+        fi
     else
-        print_error "Node.js is not installed. Please install Node.js v16 or higher."
-        exit 1
+        print_error "Node.js is not installed. Please install Node.js 16 or higher."
+        return 1
     fi
 }
 
-# Check if npm is installed
-check_npm() {
-    print_status "Checking npm installation..."
-    if command -v npm &> /dev/null; then
-        NPM_VERSION=$(npm --version)
-        print_success "npm is installed: $NPM_VERSION"
+# Function to check npm version
+check_npm_version() {
+    if command_exists npm; then
+        NPM_VERSION=$(npm --version | cut -d'.' -f1)
+        if [ "$NPM_VERSION" -ge 8 ]; then
+            print_success "npm version $(npm --version) is compatible"
+            return 0
+        else
+            print_error "npm version $(npm --version) is too old. Please install npm 8 or higher."
+            return 1
+        fi
     else
-        print_error "npm is not installed. Please install npm."
-        exit 1
+        print_error "npm is not installed. Please install npm 8 or higher."
+        return 1
     fi
 }
 
-# Check if Java is installed
+# Function to check Java installation
 check_java() {
-    print_status "Checking Java installation..."
-    if command -v java &> /dev/null; then
-        JAVA_VERSION=$(java -version 2>&1 | head -n 1)
-        print_success "Java is installed: $JAVA_VERSION"
+    if command_exists java; then
+        JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
+        if [ "$JAVA_VERSION" -ge 8 ]; then
+            print_success "Java version $(java -version 2>&1 | head -n 1) is compatible"
+            return 0
+        else
+            print_error "Java version is too old. Please install Java 8 or higher."
+            return 1
+        fi
     else
-        print_error "Java is not installed. Please install Java JDK 8 or higher."
-        exit 1
+        print_error "Java is not installed. Please install Java 8 or higher."
+        return 1
     fi
 }
 
-# Install Appium globally
+# Function to check Android SDK
+check_android_sdk() {
+    if [ -n "$ANDROID_HOME" ]; then
+        if [ -d "$ANDROID_HOME" ]; then
+            print_success "Android SDK found at $ANDROID_HOME"
+            return 0
+        else
+            print_error "ANDROID_HOME is set but directory does not exist: $ANDROID_HOME"
+            return 1
+        fi
+    else
+        print_warning "ANDROID_HOME is not set. Android testing will not be available."
+        return 1
+    fi
+}
+
+# Function to check Xcode (macOS only)
+check_xcode() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if command_exists xcode-select; then
+            if xcode-select -p >/dev/null 2>&1; then
+                print_success "Xcode Command Line Tools are installed"
+                return 0
+            else
+                print_error "Xcode Command Line Tools are not installed. Run: xcode-select --install"
+                return 1
+            fi
+        else
+            print_error "Xcode is not installed. Please install Xcode from the App Store."
+            return 1
+        fi
+    else
+        print_warning "Xcode check skipped (not on macOS)"
+        return 0
+    fi
+}
+
+# Function to install Appium
 install_appium() {
-    print_status "Installing Appium globally..."
-    if command -v appium &> /dev/null; then
-        APPIUM_VERSION=$(appium --version)
-        print_success "Appium is already installed: $APPIUM_VERSION"
+    print_status "Installing Appium..."
+    if command_exists appium; then
+        print_success "Appium is already installed"
     else
         npm install -g appium
         print_success "Appium installed successfully"
     fi
 }
 
-# Install Appium drivers
+# Function to install Appium drivers
 install_appium_drivers() {
     print_status "Installing Appium drivers..."
     
     # Install UiAutomator2 driver for Android
-    print_status "Installing UiAutomator2 driver for Android..."
-    appium driver install uiautomator2
-    
-    # Install XCUITest driver for iOS
-    print_status "Installing XCUITest driver for iOS..."
-    appium driver install xcuitest
-    
-    print_success "Appium drivers installed successfully"
-}
-
-# Check Android SDK setup
-check_android_sdk() {
-    print_status "Checking Android SDK setup..."
-    
-    if [ -z "$ANDROID_HOME" ]; then
-        print_warning "ANDROID_HOME environment variable is not set."
-        print_status "Please set ANDROID_HOME to your Android SDK path:"
-        print_status "export ANDROID_HOME=/path/to/android/sdk"
-        print_status "Add this to your ~/.bashrc or ~/.zshrc file"
+    if appium driver list | grep -q "uiautomator2"; then
+        print_success "UiAutomator2 driver is already installed"
     else
-        print_success "ANDROID_HOME is set to: $ANDROID_HOME"
+        appium driver install uiautomator2
+        print_success "UiAutomator2 driver installed"
     fi
     
-    # Check if adb is available
-    if command -v adb &> /dev/null; then
-        print_success "ADB is available"
-    else
-        print_warning "ADB is not available. Make sure Android SDK platform-tools are installed."
-    fi
-}
-
-# Check iOS setup (macOS only)
-check_ios_setup() {
+    # Install XCUITest driver for iOS (macOS only)
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        print_status "Checking iOS setup..."
-        
-        # Check if Xcode is installed
-        if command -v xcodebuild &> /dev/null; then
-            XCODE_VERSION=$(xcodebuild -version | head -n 1)
-            print_success "Xcode is installed: $XCODE_VERSION"
+        if appium driver list | grep -q "xcuitest"; then
+            print_success "XCUITest driver is already installed"
         else
-            print_warning "Xcode is not installed. Please install Xcode from the App Store."
+            appium driver install xcuitest
+            print_success "XCUITest driver installed"
         fi
-        
-        # Check if Xcode Command Line Tools are installed
-        if command -v xcrun &> /dev/null; then
-            print_success "Xcode Command Line Tools are available"
-        else
-            print_warning "Xcode Command Line Tools are not installed. Run: xcode-select --install"
-        fi
-    else
-        print_status "Skipping iOS setup (not on macOS)"
     fi
 }
 
-# Install project dependencies
-install_project_dependencies() {
-    print_status "Installing project dependencies..."
-    
-    # Navigate to the Playwright directory
-    cd "$(dirname "$0")/.."
-    
-    # Install npm dependencies
-    npm install
-    
-    print_success "Project dependencies installed successfully"
-}
-
-# Create necessary directories
+# Function to create necessary directories
 create_directories() {
     print_status "Creating necessary directories..."
     
-    # Create apps directory for mobile apps
     mkdir -p apps
-    
-    # Create logs directory
-    mkdir -p logs
-    
-    # Create screenshots directory
     mkdir -p screenshots
-    
-    # Create test-results directory
+    mkdir -p logs
+    mkdir -p allure-results
     mkdir -p test-results
+    mkdir -p reports
     
     print_success "Directories created successfully"
 }
 
-# Create environment file
-create_env_file() {
-    print_status "Creating environment file..."
+# Function to install project dependencies
+install_dependencies() {
+    print_status "Installing project dependencies..."
     
-    if [ ! -f .env ]; then
+    if [ -f "package.json" ]; then
+        npm install
+        print_success "Project dependencies installed"
+    else
+        print_error "package.json not found. Please run this script from the mobile directory."
+        exit 1
+    fi
+}
+
+# Function to create environment file
+create_env_file() {
+    print_status "Creating environment configuration..."
+    
+    if [ ! -f ".env" ]; then
         cat > .env << EOF
 # Mobile Automation Environment Variables
 
-# Android Configuration
-ANDROID_HOME=/path/to/android/sdk
-ANDROID_APP_PATH=./apps/your-app.apk
+# App paths (update these with your actual app paths)
+ANDROID_APP_PATH=./apps/your-android-app.apk
+IOS_APP_PATH=./apps/your-ios-app.app
 
-# iOS Configuration
-IOS_APP_PATH=./apps/your-app.app
+# Device UDIDs (update these with your actual device UDIDs)
+ANDROID_UDID_1=emulator-5554
+ANDROID_UDID_2=emulator-5556
+IOS_UDID_1=simulator-1
+IOS_UDID_2=simulator-2
 
-# Appium Configuration
+# Appium settings
 APPIUM_HOST=127.0.0.1
 APPIUM_PORT=4723
 
-# Test Configuration
-MOBILE_TEST_TIMEOUT=30000
-MOBILE_IMPLICIT_WAIT=10000
+# Test settings
+HEADLESS=false
+DEBUG=false
+PARALLEL=true
+
+# Reporting
+ALLURE_RESULTS_DIR=./allure-results
+SCREENSHOTS_DIR=./screenshots
+LOGS_DIR=./logs
 EOF
         print_success "Environment file created: .env"
-        print_warning "Please update the paths in .env file with your actual app paths"
+        print_warning "Please update the .env file with your actual app paths and device UDIDs"
     else
-        print_status "Environment file already exists: .env"
+        print_success "Environment file already exists: .env"
     fi
 }
 
-# Verify installation
-verify_installation() {
-    print_status "Verifying installation..."
+# Function to create sample apps directory
+create_sample_apps() {
+    print_status "Creating sample apps directory..."
     
-    # Check Appium drivers
-    print_status "Checking Appium drivers..."
-    appium driver list
+    mkdir -p apps
     
-    # Check if WebDriverIO is available
-    if npx wdio --version &> /dev/null; then
-        print_success "WebDriverIO is available"
-    else
-        print_error "WebDriverIO is not available. Please check the installation."
-    fi
+    # Create placeholder files
+    touch apps/your-android-app.apk
+    touch apps/your-ios-app.app
     
-    print_success "Installation verification completed"
+    print_success "Sample apps directory created"
+    print_warning "Please replace the placeholder files with your actual mobile apps"
 }
 
-# Display next steps
+# Function to validate setup
+validate_setup() {
+    print_status "Validating setup..."
+    
+    local errors=0
+    
+    # Check if all required tools are available
+    if ! check_node_version; then
+        ((errors++))
+    fi
+    
+    if ! check_npm_version; then
+        ((errors++))
+    fi
+    
+    if ! check_java; then
+        ((errors++))
+    fi
+    
+    # Check if Appium is installed
+    if ! command_exists appium; then
+        print_error "Appium is not installed"
+        ((errors++))
+    fi
+    
+    # Check if Appium drivers are installed
+    if ! appium driver list | grep -q "uiautomator2"; then
+        print_error "UiAutomator2 driver is not installed"
+        ((errors++))
+    fi
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if ! appium driver list | grep -q "xcuitest"; then
+            print_error "XCUITest driver is not installed"
+            ((errors++))
+        fi
+    fi
+    
+    # Check if project dependencies are installed
+    if [ ! -d "node_modules" ]; then
+        print_error "Project dependencies are not installed"
+        ((errors++))
+    fi
+    
+    if [ $errors -eq 0 ]; then
+        print_success "Setup validation passed!"
+        return 0
+    else
+        print_error "Setup validation failed with $errors error(s)"
+        return 1
+    fi
+}
+
+# Function to display next steps
 show_next_steps() {
-    echo ""
-    echo "🎉 Mobile Automation Setup Complete!"
-    echo ""
+    echo
+    print_success "Mobile automation framework setup completed!"
+    echo
     echo "Next steps:"
-    echo "1. Update the .env file with your app paths"
-    echo "2. Set up Android SDK and ANDROID_HOME environment variable"
-    echo "3. For iOS testing, ensure Xcode is installed (macOS only)"
-    echo "4. Place your mobile apps in the apps/ directory"
-    echo "5. Run tests using:"
-    echo "   - npm run mobile:android (for Android)"
-    echo "   - npm run mobile:ios (for iOS)"
-    echo "   - npm run mobile:parallel (for both platforms)"
-    echo ""
-    echo "For more information, see: mobile/README.md"
-    echo ""
+    echo "1. Update the .env file with your actual app paths and device UDIDs"
+    echo "2. Place your mobile apps in the apps/ directory"
+    echo "3. Start your Android emulator or iOS simulator"
+    echo "4. Run your first test: npm run mobile:android"
+    echo
+    echo "Available commands:"
+    echo "  npm run mobile:android     - Run Android tests"
+    echo "  npm run mobile:ios         - Run iOS tests (macOS only)"
+    echo "  npm run mobile:parallel    - Run tests in parallel"
+    echo "  npm run mobile:login       - Run login tests"
+    echo "  npm run mobile:dashboard   - Run dashboard tests"
+    echo "  npm run mobile:profile     - Run profile tests"
+    echo "  npm run mobile:report      - Generate test reports"
+    echo
+    echo "For more information, see the README.md file"
 }
 
-# Main execution
+# Main setup function
 main() {
-    echo "🚀 Starting Mobile Automation Setup..."
-    echo ""
+    echo "=========================================="
+    echo "Mobile Automation Framework Setup"
+    echo "=========================================="
+    echo
     
-    check_nodejs
-    check_npm
+    # Check system requirements
+    print_status "Checking system requirements..."
+    check_node_version
+    check_npm_version
     check_java
+    check_android_sdk
+    check_xcode
+    
+    # Install Appium and drivers
     install_appium
     install_appium_drivers
-    check_android_sdk
-    check_ios_setup
-    install_project_dependencies
+    
+    # Create project structure
     create_directories
+    create_sample_apps
+    
+    # Install dependencies
+    install_dependencies
+    
+    # Create configuration files
     create_env_file
-    verify_installation
+    
+    # Validate setup
+    validate_setup
+    
+    # Show next steps
     show_next_steps
 }
 
