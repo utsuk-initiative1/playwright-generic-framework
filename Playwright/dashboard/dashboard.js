@@ -62,33 +62,127 @@ class TestDashboard {
     }
 
     async fetchTestResults() {
-        // Simulate API call - replace with actual implementation
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                this.testData = {
-                    total: 12,
-                    passed: 8,
-                    failed: 2,
-                    skipped: 2,
-                    lastUpdated: new Date().toISOString(),
-                    tests: [
-                        { name: "Homepage Navigation", status: "passed", duration: "1.2s", timestamp: new Date().toISOString() },
-                        { name: "User Login", status: "passed", duration: "2.1s", timestamp: new Date().toISOString() },
-                        { name: "Product Search", status: "passed", duration: "1.8s", timestamp: new Date().toISOString() },
-                        { name: "Add to Cart", status: "passed", duration: "1.5s", timestamp: new Date().toISOString() },
-                        { name: "Checkout Process", status: "failed", duration: "3.2s", timestamp: new Date().toISOString() },
-                        { name: "Payment Gateway", status: "passed", duration: "2.8s", timestamp: new Date().toISOString() },
-                        { name: "Order Confirmation", status: "passed", duration: "1.1s", timestamp: new Date().toISOString() },
-                        { name: "User Profile", status: "passed", duration: "1.9s", timestamp: new Date().toISOString() },
-                        { name: "Password Reset", status: "skipped", duration: "0.0s", timestamp: new Date().toISOString() },
-                        { name: "Email Verification", status: "passed", duration: "1.4s", timestamp: new Date().toISOString() },
-                        { name: "API Endpoints", status: "failed", duration: "2.3s", timestamp: new Date().toISOString() },
-                        { name: "Mobile Responsive", status: "skipped", duration: "0.0s", timestamp: new Date().toISOString() }
-                    ]
-                };
-                resolve();
-            }, 1000);
-        });
+        try {
+            // Try to fetch from actual Playwright results first
+            const playwrightResults = await this.fetchPlaywrightResults();
+            if (playwrightResults) {
+                this.testData = playwrightResults;
+                return;
+            }
+        } catch (error) {
+            console.warn('Could not fetch Playwright results:', error.message);
+        }
+
+        try {
+            // Try to fetch from Allure results
+            const allureResults = await this.fetchAllureResults();
+            if (allureResults) {
+                this.testData = allureResults;
+                return;
+            }
+        } catch (error) {
+            console.warn('Could not fetch Allure results:', error.message);
+        }
+
+        // Fallback to sample data
+        this.testData = this.getSampleData();
+    }
+
+    async fetchPlaywrightResults() {
+        // Try to read from playwright-report directory
+        const response = await fetch('./playwright-report/data.json');
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        return this.parsePlaywrightResults(data);
+    }
+
+    async fetchAllureResults() {
+        // Try to read from allure-results directory
+        const response = await fetch('./allure-results/data.json');
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        return this.parseAllureResults(data);
+    }
+
+    parsePlaywrightResults(data) {
+        const tests = data.suites?.flatMap(suite => 
+            suite.specs?.flatMap(spec => 
+                spec.tests?.map(test => ({
+                    name: `${spec.title} - ${test.title}`,
+                    status: test.results?.[0]?.status || 'unknown',
+                    duration: `${(test.results?.[0]?.duration || 0) / 1000}s`,
+                    timestamp: new Date(test.results?.[0]?.startTime || Date.now()).toISOString(),
+                    error: test.results?.[0]?.error?.message || null
+                })) || []
+            ) || []
+        ) || [];
+
+        const statusCounts = tests.reduce((acc, test) => {
+            acc[test.status] = (acc[test.status] || 0) + 1;
+            return acc;
+        }, {});
+
+        return {
+            total: tests.length,
+            passed: statusCounts.passed || 0,
+            failed: statusCounts.failed || 0,
+            skipped: statusCounts.skipped || 0,
+            lastUpdated: new Date().toISOString(),
+            tests: tests,
+            source: 'playwright'
+        };
+    }
+
+    parseAllureResults(data) {
+        const tests = data.children?.map(test => ({
+            name: test.name,
+            status: test.status?.toLowerCase() || 'unknown',
+            duration: `${(test.time?.duration || 0) / 1000}s`,
+            timestamp: new Date(test.time?.start || Date.now()).toISOString(),
+            error: test.statusDetails?.message || null
+        })) || [];
+
+        const statusCounts = tests.reduce((acc, test) => {
+            acc[test.status] = (acc[test.status] || 0) + 1;
+            return acc;
+        }, {});
+
+        return {
+            total: tests.length,
+            passed: statusCounts.passed || 0,
+            failed: statusCounts.failed || 0,
+            skipped: statusCounts.skipped || 0,
+            lastUpdated: new Date().toISOString(),
+            tests: tests,
+            source: 'allure'
+        };
+    }
+
+    getSampleData() {
+        return {
+            total: 12,
+            passed: 8,
+            failed: 2,
+            skipped: 2,
+            lastUpdated: new Date().toISOString(),
+            tests: [
+                { name: "Homepage Navigation", status: "passed", duration: "1.2s", timestamp: new Date().toISOString() },
+                { name: "User Login", status: "passed", duration: "2.1s", timestamp: new Date().toISOString() },
+                { name: "Product Search", status: "passed", duration: "1.8s", timestamp: new Date().toISOString() },
+                { name: "Add to Cart", status: "passed", duration: "1.5s", timestamp: new Date().toISOString() },
+                { name: "Checkout Process", status: "failed", duration: "3.2s", timestamp: new Date().toISOString() },
+                { name: "Payment Gateway", status: "passed", duration: "2.8s", timestamp: new Date().toISOString() },
+                { name: "Order Confirmation", status: "passed", duration: "1.1s", timestamp: new Date().toISOString() },
+                { name: "User Profile", status: "passed", duration: "1.9s", timestamp: new Date().toISOString() },
+                { name: "Password Reset", status: "skipped", duration: "0.0s", timestamp: new Date().toISOString() },
+                { name: "Email Verification", status: "passed", duration: "1.4s", timestamp: new Date().toISOString() },
+                { name: "API Endpoints", status: "failed", duration: "2.3s", timestamp: new Date().toISOString() },
+                { name: "Mobile Responsive", status: "skipped", duration: "0.0s", timestamp: new Date().toISOString() }
+            ],
+            source: 'sample'
+        };
     }
 
     updateStats() {
@@ -98,6 +192,15 @@ class TestDashboard {
         document.getElementById('passedTests').textContent = this.testData.passed;
         document.getElementById('failedTests').textContent = this.testData.failed;
         document.getElementById('skippedTests').textContent = this.testData.skipped;
+
+        // Update data source indicator
+        const dataSource = document.getElementById('dataSource');
+        if (dataSource) {
+            const sourceText = this.testData.source === 'playwright' ? '📊 Playwright Results' :
+                              this.testData.source === 'allure' ? '📈 Allure Results' :
+                              '📝 Sample Data';
+            dataSource.textContent = sourceText;
+        }
 
         // Update last updated time
         const lastUpdated = document.getElementById('lastUpdated');

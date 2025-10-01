@@ -71,12 +71,24 @@ check_npm_version() {
 # Function to check Java installation
 check_java() {
     if command_exists java; then
-        JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
-        if [ "$JAVA_VERSION" -ge 8 ]; then
-            print_success "Java version $(java -version 2>&1 | head -n 1) is compatible"
-            return 0
+        JAVA_OUTPUT=$(java -version 2>&1 | head -n 1)
+        if [[ "$JAVA_OUTPUT" == *"Unable to locate a Java Runtime"* ]]; then
+            print_error "Java is not properly installed. Please install Java 8 or higher."
+            return 1
+        fi
+        
+        # Try to extract version number safely
+        if [[ "$JAVA_OUTPUT" =~ version\ \"([0-9]+)\.([0-9]+) ]]; then
+            JAVA_MAJOR_VERSION="${BASH_REMATCH[1]}"
+            if [ "$JAVA_MAJOR_VERSION" -ge 8 ]; then
+                print_success "Java version $JAVA_OUTPUT is compatible"
+                return 0
+            else
+                print_error "Java version is too old. Please install Java 8 or higher."
+                return 1
+            fi
         else
-            print_error "Java version is too old. Please install Java 8 or higher."
+            print_warning "Could not determine Java version. Please ensure Java 8 or higher is installed."
             return 1
         fi
     else

@@ -1,5 +1,5 @@
 {
-  "name": "mobile-automation-framework",
+  "name": "@utsuk-initiative1/mobile-automation-framework",
   "version": "1.0.0",
   "description": "Mobile automation framework using Appium and WebDriverIO",
   "main": "index.js",
@@ -34,7 +34,7 @@
     "ios",
     "testing"
   ],
-  "author": "Your Name",
+  "author": "Utsuk Initiative",
   "license": "MIT",
   "dependencies": {
     "@wdio/allure-reporter": "^8.32.5",
@@ -67,10 +67,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mobile-automation-framework.git"
+    "url": "https://github.com/utsuk-initiative1/playwright-generic-framework.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/mobile-automation-framework/issues"
+    "url": "https://github.com/utsuk-initiative1/playwright-generic-framework/issues"
   },
-  "homepage": "https://github.com/yourusername/mobile-automation-framework#readme"
+  "homepage": "https://github.com/utsuk-initiative1/playwright-generic-framework#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }

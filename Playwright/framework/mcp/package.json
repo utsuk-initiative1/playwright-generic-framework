@@ -1,0 +1,39 @@
+{
+  "name": "@utsuk-initiative1/playwright-mcp-integration",
+  "version": "1.0.0",
+  "description": "MCP (Model Context Protocol) integration for Playwright automation framework",
+  "main": "MCPIntegration.js",
+  "type": "module",
+  "scripts": {
+    "start": "node MCPServer.js",
+    "test": "node test-mcp.js",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "playwright",
+    "automation",
+    "ai",
+    "testing",
+    "natural-language"
+  ],
+  "author": "Utsuk Initiative",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@playwright/test": "^1.53.0",
+    "openai": "^4.0.0",
+    "@google/generative-ai": "^0.2.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

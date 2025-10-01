@@ -1,0 +1,16 @@
+{
+  "name": "test-allure-demo",
+  "version": "1.0.0",
+  "description": "Test Allure reporting functionality",
+  "scripts": {
+    "test": "playwright test",
+    "test:allure": "playwright test --reporter=allure-playwright",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "allure:serve": "allure serve allure-results"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "allure-playwright": "^2.9.0"
+  }
+}

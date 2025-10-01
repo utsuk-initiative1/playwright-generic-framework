@@ -1,80 +1,75 @@
 {
-  "name": "@utsuk-initiative1/playwright-framework-cli",
-  "version": "2.1.1",
-  "description": "A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, mobile testing, and advanced features",
-  "main": "enhanced-cli.js",
-  "bin": {
-    "playwright-framework": "./enhanced-cli.js",
-    "pw-framework": "./enhanced-cli.js",
-    "utsuk-playwright": "./enhanced-cli.js"
-  },
+  "name": "Mobile-android-ios",
+  "version": "2.0.0",
+  "description": "Comprehensive Playwright automation framework",
+  "main": "index.js",
   "scripts": {
-    "start": "node enhanced-cli.js",
-    "cli": "node enhanced-cli.js",
-    "test": "echo \"No tests specified\" && exit 0",
-    "publish-github": "npm publish --registry=https://npm.pkg.github.com"
+    "test": "playwright test --config=framework.config.ts",
+    "test:ui": "playwright test --config=framework.config.ts --ui",
+    "test:headed": "playwright test --config=framework.config.ts --headed",
+    "test:debug": "playwright test --config=framework.config.ts --debug",
+    "test:smoke": "playwright test tests/smoke/ --config=framework.config.ts",
+    "test:regression": "playwright test tests/regression/ --config=framework.config.ts",
+    "test:accessibility": "playwright test tests/accessibility/ --config=framework.config.ts",
+    "test:performance": "playwright test tests/performance/ --config=framework.config.ts",
+    "test:e2e": "playwright test tests/e2e/ --config=framework.config.ts",
+    "test:all": "playwright test --config=framework.config.ts",
+    "test:suites": "playwright test --config=framework.config.ts --reporter=html && playwright show-report",
+    "test:parallel": "playwright test --config=framework.config.ts --workers=4",
+    "test:sequential": "playwright test --config=framework.config.ts --workers=1",
+    "test:chrome": "playwright test --config=framework.config.ts --project=chromium",
+    "test:firefox": "playwright test --config=framework.config.ts --project=firefox",
+    "test:safari": "playwright test --config=framework.config.ts --project=webkit",
+    "test:mobile": "playwright test --config=framework.config.ts --project=mobile-chrome",
+    "test:staging": "TEST_ENV=staging playwright test --config=framework.config.ts",
+    "test:production": "TEST_ENV=production playwright test --config=framework.config.ts",
+    "test:local": "TEST_ENV=local playwright test --config=framework.config.ts",
+    "report": "playwright show-report",
+    "install-browsers": "playwright install",
+    "codegen": "playwright codegen",
+    "trace": "playwright show-trace",
+    "framework:setup": "node -e \"console.log('Framework setup completed. Update framework.config.ts with your application URLs.')\"",
+    "framework:docs": "echo 'Framework documentation available at docs/README.md'",
+    "test:api": "playwright test tests/api/ --config=framework.config.ts",
+    "test:visual": "playwright test tests/visual/ --config=framework.config.ts",
+    "update-baselines": "playwright test --update-snapshots",
+    "lighthouse": "lighthouse --output html --output-path ./performance-results/",
+    "test:mobile-only": "playwright test tests/mobile/ --config=framework.config.ts",
+    "docker:build": "docker build -t playwright-tests .",
+    "docker:run": "docker run playwright-tests",
+    "test:cloud": "playwright test --config=cloud.config.ts"
   },
   "keywords": [
     "playwright",
+    "testing",
     "automation",
     "framework",
-    "cli",
-    "testing",
     "e2e",
     "typescript",
-    "setup",
-    "scaffold",
-    "accessibility",
-    "performance",
-    "visual-testing",
-    "mobile-testing",
+    "page-object-model",
     "api-testing",
-    "appium",
-    "mobile-automation"
+    "visual-testing",
+    "performance-testing",
+    "accessibility-testing",
+    "mobile-testing",
+    "ci-cd",
+    "docker",
+    "cloud-testing"
   ],
-  "author": "Utsuk Initiative",
+  "author": "Your Name",
   "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.53.0",
+    "@types/node": "^20.11.24",
+    "axios": "^1.6.0",
+    "@types/axios": "^0.14.0",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0",
+    "lighthouse": "^11.0.0",
+    "axe-core": "^4.8.0",
+    "@axe-core/playwright": "^4.8.0"
+  },
   "engines": {
     "node": ">=16.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/utsuk-initiative1/playwright-generic-framework.git"
-  },
-  "bugs": {
-    "url": "https://github.com/utsuk-initiative1/playwright-generic-framework/issues"
-  },
-  "homepage": "https://github.com/utsuk-initiative1/playwright-generic-framework#readme",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
-  "files": [
-    "enhanced-cli.js",
-    "run-enhanced-cli.js",
-    "cli-templates/",
-    "ENHANCED_CLI_README.md",
-    "README.md",
-    "CLI_README.md",
-    "QUICK_START.md"
-  ],
-  "dependencies": {
-    "dotenv": "^16.3.1"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "@wdio/appium-service": "^8.32.0",
-    "@wdio/cli": "^8.32.0",
-    "@wdio/local-runner": "^8.32.0",
-    "@wdio/mocha-framework": "^8.32.0",
-    "@wdio/spec-reporter": "^8.32.0",
-    "@wdio/types": "^8.32.0",
-    "appium": "^2.2.0",
-    "appium-uiautomator2-driver": "^2.34.0",
-    "appium-xcuitest-driver": "^5.6.0",
-    "ts-node": "^10.9.0",
-    "wdio-appium-service": "^8.32.0",
-    "adm-zip": "^0.5.10"
   }
 }
