@@ -1,7 +1,7 @@
 {
   "name": "@utsuk-initiative1/playwright-framework-cli",
-  "version": "2.1.0",
-  "description": "A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, mobile testing, and advanced features",
+  "version": "2.4.0",
+  "description": "A comprehensive CLI tool to set up Playwright automation frameworks with UI, Mobile, API testing, accessibility testing, performance testing, and advanced features",
   "main": "enhanced-cli.js",
   "bin": {
     "playwright-framework": "./enhanced-cli.js",
