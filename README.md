@@ -1,8 +1,8 @@
-# 🚀 Playwright Generic Framework
+# Playwright Generic Framework
 
 A comprehensive, modular Playwright automation framework supporting E2E, API, mobile, accessibility, performance, and visual testing.
 
-## 📦 Quick Start with CLI
+## Quick Start with CLI
 
 ### One-Line Installation
 ```bash
@@ -21,23 +21,23 @@ npm install -g @utsuk-initiative1/playwright-framework-cli
 playwright-framework
 ```
 
-## 🎯 What You Get
+## What You Get
 
 This framework provides a complete testing solution with:
 
-- 🎯 **Interactive CLI Setup** - Guided project creation
+- **Interactive CLI Setup** - Guided project creation
 
-- ♿ **Accessibility Testing** - WCAG compliance checking
-- 📱 **Mobile Testing** - Device simulation and touch testing
-- 🔍 **Visual Regression Testing** - Screenshot comparison
-- 📊 **Performance Testing** - Lighthouse integration
-- 🧪 **API Testing** - REST and GraphQL support
-- 📈 **Comprehensive Reporting** - HTML, JSON, and dashboard
-- 🚀 **CI/CD Integration** - GitHub Actions, GitLab CI, Jenkins
-- 🐳 **Docker Support** - Containerized testing
-- ☁️ **Cloud Testing** - Cross-browser testing
+- **Accessibility Testing** - WCAG compliance checking
+- **Mobile Testing** - Device simulation and touch testing
+- **Visual Regression Testing** - Screenshot comparison
+- **Performance Testing** - Lighthouse integration
+- **API Testing** - REST and GraphQL support
+- **Comprehensive Reporting** - HTML, JSON, and dashboard
+- **CI/CD Integration** - GitHub Actions, GitLab CI, Jenkins
+- **Docker Support** - Containerized testing
+- **Cloud Testing** - Cross-browser testing
 
-## 🏗️ Framework Architecture
+## Framework Architecture
 
 ```
 your-project/
@@ -64,7 +64,7 @@ your-project/
 └── config files        # Playwright and framework config
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **Node.js** (version 16 or higher)
@@ -113,7 +113,7 @@ npx playwright install
 npm test
 ```
 
-## 🛠️ Available Commands
+## Available Commands
 
 ### CLI Commands
 ```bash
@@ -166,7 +166,7 @@ npm run update-baselines    # Update visual test baselines
 
 
 
-## 📊 Reporting & Analytics
+## Reporting & Analytics
 
 ### HTML Reports
 ```bash
@@ -186,13 +186,13 @@ npm run dashboard           # Start real-time monitoring
 ```
 
 ### Features
-- 📈 **Real-time Monitoring** - Live test execution tracking
-- 📊 **Performance Metrics** - Response times and benchmarks
-- 🎯 **Test Analytics** - Success rates and trends
-- 📱 **Mobile Insights** - Device-specific performance
-- ♿ **Accessibility Reports** - WCAG compliance status
+- **Real-time Monitoring** - Live test execution tracking
+- **Performance Metrics** - Response times and benchmarks
+- **Test Analytics** - Success rates and trends
+- **Mobile Insights** - Device-specific performance
+- **Accessibility Reports** - WCAG compliance status
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Setup
 Edit `framework/config/EnvironmentConfig.ts`:
@@ -246,7 +246,7 @@ export default defineConfig({
 });
 ```
 
-## 🚀 CI/CD Integration
+## CI/CD Integration
 
 ### GitHub Actions
 ```yaml
@@ -316,7 +316,7 @@ pipeline {
 }
 ```
 
-## 🐳 Docker Support
+## Docker Support
 
 ### Dockerfile
 ```dockerfile
@@ -344,7 +344,7 @@ services:
       - CI=true
 ```
 
-## 📚 Documentation
+## Documentation
 
 - **[Team Setup Guide](Playwright/TEAM_SETUP_GUIDE.md)** - Complete setup instructions
 - **[Quick Reference](Playwright/QUICK_REFERENCE.md)** - Common commands
@@ -352,7 +352,7 @@ services:
 - **[Enhanced Features](Playwright/ENHANCED_CLI_README.md)** - Advanced capabilities
 - **[GitHub Packages Guide](Playwright/GITHUB_PACKAGES_GUIDE.md)** - Package management
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -379,7 +379,7 @@ node --version  # Should be 16+
 npm config set @utsuk-initiative1:registry https://npm.pkg.github.com
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -387,17 +387,17 @@ npm config set @utsuk-initiative1:registry https://npm.pkg.github.com
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details
 
-## 🆘 Support
+## Support
 
 - **GitHub Issues**: [Report Issues](https://github.com/utsuk-initiative1/playwright-generic-framework/issues)
 - **Documentation**: Check the guides in the `Playwright/` directory
 - **Team Support**: Contact your team lead
 
-## 🎉 Acknowledgments
+## Acknowledgments
 
 - **Playwright Team** - For the amazing testing framework
 
@@ -405,6 +405,6 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ---
 
-**Made with ❤️ by Utsuk Initiative**
+**Made with love by Utsuk Initiative**
 
 **Repository**: https://github.com/utsuk-initiative1/playwright-generic-framework

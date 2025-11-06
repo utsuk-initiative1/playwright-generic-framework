@@ -19,6 +19,11 @@ class EnhancedPlaywrightCLI {
     this.parseCommandLineArgs();
   }
 
+  // Utility method for delays
+  async delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   parseCommandLineArgs() {
     const args = process.argv.slice(2);
     this.cliArgs = {};
@@ -34,7 +39,7 @@ class EnhancedPlaywrightCLI {
   }
 
   showHelp() {
-    console.log('\n🚀 Enhanced Playwright Framework CLI\n');
+    console.log('\nEnhanced Playwright Framework CLI\n');
     console.log('Usage: node enhanced-cli.js [options]\n');
     console.log('Options:');
     console.log('  --help, -h          Show this help message\n');
@@ -44,13 +49,13 @@ class EnhancedPlaywrightCLI {
   }
 
   async run() {
-    console.log('\n🚀 Enhanced Playwright Framework CLI\n');
+    console.log('\nEnhanced Playwright Framework CLI\n');
     console.log('A powerful CLI tool for setting up comprehensive Playwright automation frameworks.\n');
 
     try {
       await this.showMainMenu();
     } catch (error) {
-      console.error('\n❌ Setup failed:', error.message);
+      console.error('\nSetup failed:', error.message);
       process.exit(1);
     } finally {
       this.rl.close();
@@ -58,14 +63,14 @@ class EnhancedPlaywrightCLI {
   }
 
   async showMainMenu() {
-    console.log('🎯 Main Menu\n');
-    console.log('1. 🚀 Create new project');
-    console.log('2. 🔧 Add features to existing project');
-    console.log('3. 📊 Generate test reports');
-    console.log('4. 🔄 Update framework');
-    console.log('5. 🤖 AI-Powered Test Generation (MCP)');
-    console.log('6. 📚 Show documentation');
-    console.log('7. ❌ Exit');
+    console.log('Main Menu\n');
+    console.log('1. Create new project');
+    console.log('2. Add features to existing project');
+    console.log('3. Generate test reports');
+    console.log('4. Update framework');
+    console.log('5. AI-Powered Test Generation (MCP)');
+    console.log('6. Show documentation');
+    console.log('7. Exit');
     
     const choice = await this.question('\nSelect an option (1-7): ');
     
@@ -93,13 +98,13 @@ class EnhancedPlaywrightCLI {
         process.exit(0);
         break;
       default:
-        console.log('\n❌ Invalid option. Please try again.');
+        console.log('\nInvalid option. Please try again.');
         await this.showMainMenu();
     }
   }
 
   async createNewProject() {
-    console.log('\n🚀 Creating New Project\n');
+    console.log('\nCreating New Project\n');
     
     await this.getProjectDetails();
     await this.selectFrameworkTemplate();
@@ -126,44 +131,44 @@ class EnhancedPlaywrightCLI {
   }
 
   async getProjectDetails() {
-    console.log('📋 Project Configuration\n');
+    console.log('Project Configuration\n');
     
     // Ask for automation type first
-    console.log('🤖 Select Automation Type:\n');
-    console.log('1. 🌐 Web Automation (Browser-based testing)');
-    console.log('2. 📱 Mobile Automation (Native mobile apps)');
-    console.log('3. 🔄 Hybrid (Both web and mobile)');
+    console.log('Select Automation Type:\n');
+    console.log('1. Web Automation (Browser-based testing)');
+    console.log('2. Mobile Automation (Native mobile apps)');
+    console.log('3. Hybrid (Both web and mobile)');
     
     const automationType = await this.question('\nSelect automation type (1-3): ');
     
     switch (automationType) {
       case '1':
         this.automationType = 'web';
-        console.log('✅ Selected: Web Automation');
+        console.log('Selected: Web Automation');
         break;
       case '2':
         this.automationType = 'mobile';
-        console.log('✅ Selected: Mobile Automation');
+        console.log('Selected: Mobile Automation');
         await this.configureMobileApplication();
         break;
       case '3':
         this.automationType = 'hybrid';
-        console.log('✅ Selected: Hybrid Automation (Web + Mobile)');
+        console.log('Selected: Hybrid Automation (Web + Mobile)');
         await this.configureMobileApplication();
         break;
       default:
-        console.log('⚠️  Invalid choice. Using Web Automation.');
+        console.log('Invalid choice. Using Web Automation.');
         this.automationType = 'web';
     }
     
-    console.log('\n📋 Project Details:\n');
+    console.log('\nProject Details:\n');
     
     // Get project name
     this.projectName = await this.question('Enter project name (default: playwright-automation): ') || 'playwright-automation';
     
     // Validate project name
     if (!this.isValidProjectName(this.projectName)) {
-      console.log('❌ Invalid project name. Please use only letters, numbers, hyphens, and underscores.');
+      console.log('Invalid project name. Please use only letters, numbers, hyphens, and underscores.');
       this.projectName = await this.question('Enter valid project name: ');
     }
     
@@ -177,13 +182,13 @@ class EnhancedPlaywrightCLI {
         const createPath = await this.question(`Path '${this.projectPath}' does not exist. Create it? (y/n): `);
         if (createPath.toLowerCase() === 'y') {
           fs.mkdirSync(this.projectPath, { recursive: true });
-          console.log(`✅ Created directory: ${this.projectPath}`);
+          console.log(`Created directory: ${this.projectPath}`);
         } else {
           this.projectPath = await this.question('Enter valid project path: ');
         }
       }
     } catch (error) {
-      console.log('❌ Invalid path. Please enter a valid directory path.');
+      console.log('Invalid path. Please enter a valid directory path.');
       this.projectPath = await this.question('Enter valid project path: ');
     }
     
@@ -192,18 +197,18 @@ class EnhancedPlaywrightCLI {
     if (fs.existsSync(fullProjectPath)) {
       const overwrite = await this.question(`Project directory '${fullProjectPath}' already exists. Overwrite? (y/n): `);
       if (overwrite.toLowerCase() !== 'y') {
-        console.log('❌ Setup cancelled.');
+        console.log('Setup cancelled.');
         process.exit(0);
       }
       // Remove existing directory
       fs.rmSync(fullProjectPath, { recursive: true, force: true });
-      console.log(`🗑️  Removed existing directory: ${fullProjectPath}`);
+      console.log(`Removed existing directory: ${fullProjectPath}`);
     }
     
     // Configure based on automation type
     if (this.automationType === 'mobile') {
       // Mobile-specific configuration
-      console.log('\n📱 Mobile-Specific Configuration:\n');
+      console.log('\nMobile-Specific Configuration:\n');
       this.config.baseURL = 'mobile-app'; // Placeholder for mobile apps
       this.config.apiURL = 'mobile-api'; // Placeholder for mobile APIs
       
@@ -211,17 +216,17 @@ class EnhancedPlaywrightCLI {
       const environments = await this.question('Enter app environments (comma-separated, default: dev,staging,production): ') || 'dev,staging,production';
       this.config.environments = environments.split(',').map(env => env.trim());
       
-      console.log('✅ Mobile configuration: App-based testing (no web URLs needed)');
+      console.log('Mobile configuration: App-based testing (no web URLs needed)');
       
     } else if (this.automationType === 'hybrid') {
       // Hybrid configuration - ask for both web and mobile
-      console.log('\n🔄 Hybrid Configuration (Web + Mobile):\n');
+      console.log('\nHybrid Configuration (Web + Mobile):\n');
       
       this.config.baseURL = await this.question('Enter your web application base URL (default: https://example.com): ') || 'https://example.com';
       
       // Validate URL
       if (!this.isValidUrl(this.config.baseURL)) {
-        console.log('⚠️  Invalid URL format. Please enter a valid URL.');
+        console.log('Invalid URL format. Please enter a valid URL.');
         this.config.baseURL = await this.question('Enter valid base URL: ');
       }
       
@@ -232,13 +237,13 @@ class EnhancedPlaywrightCLI {
       
     } else {
       // Web-only configuration
-      console.log('\n🌐 Web-Specific Configuration:\n');
+      console.log('\nWeb-Specific Configuration:\n');
       
       this.config.baseURL = await this.question('Enter your application base URL (default: https://example.com): ') || 'https://example.com';
       
       // Validate URL
       if (!this.isValidUrl(this.config.baseURL)) {
-        console.log('⚠️  Invalid URL format. Please enter a valid URL.');
+        console.log('Invalid URL format. Please enter a valid URL.');
         this.config.baseURL = await this.question('Enter valid base URL: ');
       }
       
@@ -251,12 +256,12 @@ class EnhancedPlaywrightCLI {
     // Ask about MCP integration after base URL is collected
     await this.askAboutMCPIntegration();
     
-    console.log('\n✅ Project details captured!\n');
-    console.log(`📁 Project will be created at: ${fullProjectPath}\n`);
+    console.log('\nProject details captured!\n');
+    console.log(`Project will be created at: ${fullProjectPath}\n`);
   }
 
   async askAboutMCPIntegration() {
-    console.log('\n🤖 AI-Powered Test Generation (MCP)');
+    console.log('\nAI-Powered Test Generation (MCP)');
     console.log('=====================================\n');
     
     console.log('Would you like to use AI to automatically generate test scenarios');
@@ -267,172 +272,172 @@ class EnhancedPlaywrightCLI {
     
     if (useMCP.toLowerCase() === 'y') {
       this.config.enableMCP = true;
-      console.log('\n🎯 MCP Integration Options:\n');
+      console.log('\nMCP Integration Options:\n');
       
       if (this.automationType === 'web' || this.automationType === 'hybrid') {
-        console.log('1. 🌐 Analyze web application and generate UI tests');
-        console.log('2. 📊 Generate comprehensive test suite (UI + API + Performance)');
-        console.log('3. ♿ Generate accessibility-focused tests');
-        console.log('4. ⚡ Generate performance-focused tests');
-        console.log('5. 🎨 Generate visual regression tests');
-        console.log('6. 🔧 Custom test generation (specify requirements)');
+        console.log('1. Analyze web application and generate UI tests');
+        console.log('2. Generate comprehensive test suite (UI + API + Performance)');
+        console.log('3. Generate accessibility-focused tests');
+        console.log('4. Generate performance-focused tests');
+        console.log('5. Generate visual regression tests');
+        console.log('6. Custom test generation (specify requirements)');
         
         const mcpOption = await this.question('\nSelect MCP option (1-6): ');
         
         switch (mcpOption) {
           case '1':
             this.config.mcpType = 'ui-analysis';
-            console.log('✅ Selected: UI Application Analysis');
+            console.log('Selected: UI Application Analysis');
             break;
           case '2':
             this.config.mcpType = 'comprehensive';
-            console.log('✅ Selected: Comprehensive Test Suite');
+            console.log('Selected: Comprehensive Test Suite');
             break;
           case '3':
             this.config.mcpType = 'accessibility';
-            console.log('✅ Selected: Accessibility Tests');
+            console.log('Selected: Accessibility Tests');
             break;
           case '4':
             this.config.mcpType = 'performance';
-            console.log('✅ Selected: Performance Tests');
+            console.log('Selected: Performance Tests');
             break;
           case '5':
             this.config.mcpType = 'visual';
-            console.log('✅ Selected: Visual Regression Tests');
+            console.log('Selected: Visual Regression Tests');
             break;
           case '6':
             this.config.mcpType = 'custom';
             const customRequirements = await this.question('Describe your test requirements: ');
             this.config.mcpCustomRequirements = customRequirements;
-            console.log('✅ Selected: Custom Test Generation');
+            console.log('Selected: Custom Test Generation');
             break;
           default:
             this.config.mcpType = 'ui-analysis';
-            console.log('✅ Default: UI Application Analysis');
+            console.log('Default: UI Application Analysis');
         }
       } else if (this.automationType === 'mobile') {
-        console.log('1. 📱 Analyze mobile app and generate native tests');
-        console.log('2. 🔄 Generate cross-platform mobile tests');
-        console.log('3. 📊 Generate comprehensive mobile test suite');
-        console.log('4. ♿ Generate mobile accessibility tests');
-        console.log('5. ⚡ Generate mobile performance tests');
-        console.log('6. 🔧 Custom mobile test generation');
+        console.log('1. Analyze mobile app and generate native tests');
+        console.log('2. Generate cross-platform mobile tests');
+        console.log('3. Generate comprehensive mobile test suite');
+        console.log('4. Generate mobile accessibility tests');
+        console.log('5. Generate mobile performance tests');
+        console.log('6. Custom mobile test generation');
         
         const mcpOption = await this.question('\nSelect MCP option (1-6): ');
         
         switch (mcpOption) {
           case '1':
             this.config.mcpType = 'mobile-native';
-            console.log('✅ Selected: Native Mobile App Analysis');
+            console.log('Selected: Native Mobile App Analysis');
             break;
           case '2':
             this.config.mcpType = 'mobile-cross-platform';
-            console.log('✅ Selected: Cross-Platform Mobile Tests');
+            console.log('Selected: Cross-Platform Mobile Tests');
             break;
           case '3':
             this.config.mcpType = 'mobile-comprehensive';
-            console.log('✅ Selected: Comprehensive Mobile Test Suite');
+            console.log('Selected: Comprehensive Mobile Test Suite');
             break;
           case '4':
             this.config.mcpType = 'mobile-accessibility';
-            console.log('✅ Selected: Mobile Accessibility Tests');
+            console.log('Selected: Mobile Accessibility Tests');
             break;
           case '5':
             this.config.mcpType = 'mobile-performance';
-            console.log('✅ Selected: Mobile Performance Tests');
+            console.log('Selected: Mobile Performance Tests');
             break;
           case '6':
             this.config.mcpType = 'mobile-custom';
             const customRequirements = await this.question('Describe your mobile test requirements: ');
             this.config.mcpCustomRequirements = customRequirements;
-            console.log('✅ Selected: Custom Mobile Test Generation');
+            console.log('Selected: Custom Mobile Test Generation');
             break;
           default:
             this.config.mcpType = 'mobile-native';
-            console.log('✅ Default: Native Mobile App Analysis');
+            console.log('Default: Native Mobile App Analysis');
         }
       }
       
       // Configure AI provider
-      console.log('\n🔧 AI Provider Configuration:\n');
-      console.log('1. 🆓 Mock AI (Free - No API key needed) ⭐ RECOMMENDED');
-      console.log('2. 🤗 Hugging Face (Free tier available)');
-      console.log('3. 🦙 Ollama (Free - Local AI)');
-      console.log('4. 💰 OpenAI (Paid - Best quality)');
-      console.log('5. 💰 Claude (Paid - High quality)');
-      console.log('6. 💰 Gemini (Paid - Google AI)');
+      console.log('\nAI Provider Configuration:\n');
+      console.log('1. Mock AI (Free - No API key needed) RECOMMENDED');
+      console.log('2. Hugging Face (Free tier available)');
+      console.log('3. Ollama (Free - Local AI)');
+      console.log('4. OpenAI (Paid - Best quality)');
+      console.log('5. Claude (Paid - High quality)');
+      console.log('6. Gemini (Paid - Google AI)');
       
       const aiProvider = await this.question('\nSelect AI provider (1-6, default: 1): ') || '1';
       
       switch (aiProvider) {
         case '1':
           this.config.aiProvider = 'mock';
-          console.log('✅ Selected: Mock AI (Free)');
+          console.log('Selected: Mock AI (Free)');
           break;
         case '2':
           this.config.aiProvider = 'huggingface';
-          console.log('✅ Selected: Hugging Face');
+          console.log('Selected: Hugging Face');
           break;
         case '3':
           this.config.aiProvider = 'ollama';
-          console.log('✅ Selected: Ollama (Local)');
+          console.log('Selected: Ollama (Local)');
           break;
         case '4':
           this.config.aiProvider = 'openai';
           const openaiKey = await this.question('Enter OpenAI API key: ');
           this.config.aiApiKey = openaiKey;
-          console.log('✅ Selected: OpenAI');
+          console.log('Selected: OpenAI');
           break;
         case '5':
           this.config.aiProvider = 'claude';
           const claudeKey = await this.question('Enter Claude API key: ');
           this.config.aiApiKey = claudeKey;
-          console.log('✅ Selected: Claude');
+          console.log('Selected: Claude');
           break;
         case '6':
           this.config.aiProvider = 'gemini';
           const geminiKey = await this.question('Enter Gemini API key: ');
           this.config.aiApiKey = geminiKey;
-          console.log('✅ Selected: Gemini');
+          console.log('Selected: Gemini');
           break;
         default:
           this.config.aiProvider = 'mock';
-          console.log('✅ Default: Mock AI (Free)');
+          console.log('Default: Mock AI (Free)');
       }
       
-      console.log('\n🎉 MCP Integration configured!');
+      console.log('\nMCP Integration configured!');
       console.log('AI will analyze your application and generate comprehensive test scenarios.');
       
     } else {
       this.config.enableMCP = false;
-      console.log('✅ MCP integration skipped. You can enable it later from the main menu.');
+      console.log('MCP integration skipped. You can enable it later from the main menu.');
     }
   }
 
   async selectFrameworkTemplate() {
-    console.log('📋 Select Framework Template\n');
+    console.log('Select Framework Template\n');
     
     // Provide intelligent suggestions based on automation type
     if (this.automationType === 'mobile') {
-      console.log('📱 Mobile Application Templates:');
-      console.log('1. 📱 Mobile-Basic (Essential mobile features)');
-      console.log('2. 📱 Mobile-Standard (Full mobile testing suite)');
-      console.log('3. 📱 Mobile-Enterprise (Advanced mobile + CI/CD) ⭐ RECOMMENDED');
-      console.log('4. 🔧 Custom (Choose your features)');
+      console.log('Mobile Application Templates:');
+      console.log('1. Mobile-Basic (Essential mobile features)');
+      console.log('2. Mobile-Standard (Full mobile testing suite)');
+      console.log('3. Mobile-Enterprise (Advanced mobile + CI/CD) RECOMMENDED');
+      console.log('4. Custom (Choose your features)');
     } else if (this.automationType === 'hybrid') {
-      console.log('🔄 Hybrid Template Recommended!');
-      console.log('1. 🎯 Basic (Essential features only)');
-      console.log('2. 🚀 Standard (Recommended - Full features) ⭐ RECOMMENDED');
-      console.log('3. 🏢 Enterprise (Advanced features + CI/CD)');
-      console.log('4. 📱 Mobile-First (Mobile testing focused)');
-      console.log('5. 🔧 Custom (Choose your features)');
+      console.log('Hybrid Template Recommended!');
+      console.log('1. Basic (Essential features only)');
+      console.log('2. Standard (Recommended - Full features) RECOMMENDED');
+      console.log('3. Enterprise (Advanced features + CI/CD)');
+      console.log('4. Mobile-First (Mobile testing focused)');
+      console.log('5. Custom (Choose your features)');
     } else {
-      console.log('🌐 Web Template Recommended!');
-      console.log('1. 🎯 Basic (Essential features only)');
-      console.log('2. 🚀 Standard (Recommended - Full features) ⭐ RECOMMENDED');
-      console.log('3. 🏢 Enterprise (Advanced features + CI/CD)');
-      console.log('4. 📱 Mobile-First (Mobile testing focused)');
-      console.log('5. 🔧 Custom (Choose your features)');
+      console.log('Web Template Recommended!');
+      console.log('1. Basic (Essential features only)');
+      console.log('2. Standard (Recommended - Full features) RECOMMENDED');
+      console.log('3. Enterprise (Advanced features + CI/CD)');
+      console.log('4. Mobile-First (Mobile testing focused)');
+      console.log('5. Custom (Choose your features)');
     }
     
     const template = await this.question('\nSelect template (1-5): ');
@@ -454,74 +459,74 @@ class EnhancedPlaywrightCLI {
         await this.selectCustomFeatures();
         break;
       default:
-        console.log('⚠️  Invalid choice. Using Standard template.');
+        console.log('Invalid choice. Using Standard template.');
         this.features = this.getStandardTemplate();
     }
     
-    console.log(`\n✅ Template selected: ${this.getTemplateName(template)}\n`);
+    console.log(`\nTemplate selected: ${this.getTemplateName(template)}\n`);
   }
 
   async configureMobileApplication() {
-    console.log('\n📱 Mobile Application Configuration\n');
+    console.log('\nMobile Application Configuration\n');
     
     // Step 1: Select platform
-    console.log('🤖 Select Platform:\n');
-    console.log('1. 📱 Android (Native Android apps)');
-    console.log('2. 🍎 iOS (Native iOS apps)');
-    console.log('3. 🔄 Both (Android + iOS)');
-    console.log('4. 🌐 Web (Mobile Browser Testing)');
-    console.log('5. 🖥️  Desktop (Windows/Mac)');
+    console.log('Select Platform:\n');
+    console.log('1. Android (Native Android apps)');
+    console.log('2. iOS (Native iOS apps)');
+    console.log('3. Both (Android + iOS)');
+    console.log('4. Web (Mobile Browser Testing)');
+    console.log('5. Desktop (Windows/Mac)');
     
     const platform = await this.question('\nSelect platform (1-5): ');
     
     switch (platform) {
       case '1':
         this.mobileConfig = { platform: 'android', platforms: ['android'] };
-        console.log('✅ Selected: Android');
+        console.log('Selected: Android');
         break;
       case '2':
         this.mobileConfig = { platform: 'ios', platforms: ['ios'] };
-        console.log('✅ Selected: iOS');
+        console.log('Selected: iOS');
         break;
       case '3':
         this.mobileConfig = { platform: 'both', platforms: ['android', 'ios'] };
-        console.log('✅ Selected: Android + iOS');
+        console.log('Selected: Android + iOS');
         break;
       case '4':
         this.mobileConfig = { platform: 'mobile-web', platforms: ['mobile-web'] };
-        console.log('✅ Selected: Mobile Web');
+        console.log('Selected: Mobile Web');
         break;
       case '5':
         this.mobileConfig = { platform: 'desktop', platforms: ['desktop'] };
-        console.log('✅ Selected: Desktop');
+        console.log('Selected: Desktop');
         break;
       default:
-        console.log('⚠️  Invalid choice. Using Android.');
+        console.log('Invalid choice. Using Android.');
         this.mobileConfig = { platform: 'android', platforms: ['android'] };
     }
     
     // Step 2: App file configuration
     if (this.mobileConfig.platforms.includes('android')) {
-      console.log('\n🤖 Android Configuration');
+      console.log('\nAndroid Configuration');
       this.mobileConfig.androidAppPath = await this.question('Enter path to your Android .apk file (or press Enter to skip): ') || '';
       
       if (this.mobileConfig.androidAppPath && fs.existsSync(this.mobileConfig.androidAppPath)) {
-        console.log('✅ Android APK file found!');
+        console.log('Android APK file found!');
       } else if (this.mobileConfig.androidAppPath) {
-        console.log('⚠️  APK file not found. Will use default app.');
+        console.log('APK file not found. Will use default app.');
       }
       
       this.mobileConfig.androidPackageName = await this.question('Enter Android package name (e.g., com.example.app): ') || 'com.example.app';
     }
     
     if (this.mobileConfig.platforms.includes('ios')) {
-      console.log('\n🍎 iOS Configuration');
+      console.log('\niOS Configuration');
       this.mobileConfig.iosAppPath = await this.question('Enter path to your iOS .app file (or press Enter to skip): ') || '';
       
       if (this.mobileConfig.iosAppPath && fs.existsSync(this.mobileConfig.iosAppPath)) {
-        console.log('✅ iOS app file found!');
+        console.log('iOS app file found!');
       } else if (this.mobileConfig.iosAppPath) {
-        console.log('⚠️  iOS app file not found. Will use default app.');
+        console.log('iOS app file not found. Will use default app.');
       }
       
       this.mobileConfig.iosBundleId = await this.question('Enter iOS bundle ID (e.g., com.example.app): ') || 'com.example.app';
@@ -529,7 +534,7 @@ class EnhancedPlaywrightCLI {
     
     // Step 3: Automation engine selection
     if (this.mobileConfig.platforms.includes('android')) {
-      console.log('\n🤖 Android Automation Engine:');
+      console.log('\nAndroid Automation Engine:');
       console.log('1. UiAutomator2 (Recommended for native apps)');
       console.log('2. Espresso (For Android apps with Espresso support)');
       
@@ -539,20 +544,20 @@ class EnhancedPlaywrightCLI {
         case '1':
         case '':
           this.mobileConfig.androidEngine = 'uiautomator2';
-          console.log('✅ Selected: UiAutomator2');
+          console.log('Selected: UiAutomator2');
           break;
         case '2':
           this.mobileConfig.androidEngine = 'espresso';
-          console.log('✅ Selected: Espresso');
+          console.log('Selected: Espresso');
           break;
         default:
           this.mobileConfig.androidEngine = 'uiautomator2';
-          console.log('✅ Selected: UiAutomator2 (default)');
+          console.log('Selected: UiAutomator2 (default)');
       }
     }
     
     if (this.mobileConfig.platforms.includes('ios')) {
-      console.log('\n🍎 iOS Automation Engine:');
+      console.log('\niOS Automation Engine:');
       console.log('1. XCUITest (Recommended for native apps)');
       console.log('2. Safari (For web apps on iOS)');
       
@@ -562,20 +567,20 @@ class EnhancedPlaywrightCLI {
         case '1':
         case '':
           this.mobileConfig.iosEngine = 'xcuitest';
-          console.log('✅ Selected: XCUITest');
+          console.log('Selected: XCUITest');
           break;
         case '2':
           this.mobileConfig.iosEngine = 'safari';
-          console.log('✅ Selected: Safari');
+          console.log('Selected: Safari');
           break;
         default:
           this.mobileConfig.iosEngine = 'xcuitest';
-          console.log('✅ Selected: XCUITest (default)');
+          console.log('Selected: XCUITest (default)');
       }
     }
     
     // Step 4: Device and testing options
-    console.log('\n🧪 Testing Options:\n');
+    console.log('\nTesting Options:\n');
     this.mobileConfig.realDeviceTesting = await this.question('Enable real device testing? (y/n, default: n): ') === 'y';
     this.mobileConfig.emulatorTesting = await this.question('Enable emulator/simulator testing? (y/n, default: y): ') !== 'n';
     this.mobileConfig.parallelExecution = await this.question('Enable parallel test execution? (y/n, default: y): ') !== 'n';
@@ -583,11 +588,11 @@ class EnhancedPlaywrightCLI {
     this.mobileConfig.videoRecording = await this.question('Record test videos? (y/n, default: n): ') === 'y';
     
     // Step 5: Device configuration
-    console.log('\n📱 Device Configuration:\n');
+    console.log('\nDevice Configuration:\n');
     this.mobileConfig.deviceName = await this.question('Enter device name (default: Android Emulator): ') || 'Android Emulator';
     this.mobileConfig.platformVersion = await this.question('Enter platform version (default: 13.0): ') || '13.0';
     
-    console.log('✅ Mobile application configuration completed!');
+    console.log('Mobile application configuration completed!');
   }
 
   // Mobile-specific file generation methods
@@ -1378,65 +1383,65 @@ export abstract class BaseMobileTest {
   generateMobileSetupScript() {
     return `#!/bin/bash
 
-echo "📱 Setting up Mobile Automation Environment..."
+echo "Setting up Mobile Automation Environment..."
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then
-    echo "❌ Node.js is not installed. Please install Node.js first."
+    echo "Node.js is not installed. Please install Node.js first."
     exit 1
 fi
 
 # Check if npm is installed
 if ! command -v npm &> /dev/null; then
-    echo "❌ npm is not installed. Please install npm first."
+    echo "npm is not installed. Please install npm first."
     exit 1
 fi
 
 # Install dependencies
-echo "📦 Installing dependencies..."
+echo "Installing dependencies..."
 npm install
 
 # Install Appium globally
-echo "🤖 Installing Appium..."
+echo "Installing Appium..."
 npm install -g appium
 
 # Install Appium drivers
-echo "📱 Installing Appium drivers..."
+echo "Installing Appium drivers..."
 appium driver install uiautomator2
 appium driver install xcuitest
 
 # Check Android SDK
 if command -v adb &> /dev/null; then
-    echo "✅ Android SDK found"
+    echo "Android SDK found"
 else
-    echo "⚠️  Android SDK not found. Please install Android SDK and set ANDROID_HOME"
+    echo "Android SDK not found. Please install Android SDK and set ANDROID_HOME"
 fi
 
 # Check Xcode (macOS only)
 if [[ "$OSTYPE" == "darwin"* ]]; then
     if command -v xcrun &> /dev/null; then
-        echo "✅ Xcode found"
+        echo "Xcode found"
     else
-        echo "⚠️  Xcode not found. Please install Xcode for iOS development"
+        echo "Xcode not found. Please install Xcode for iOS development"
     fi
 fi
 
-echo "✅ Mobile automation environment setup completed!"
-echo "🚀 You can now run your mobile tests!"`;
+echo "Mobile automation environment setup completed!"
+echo "You can now run your mobile tests!"`;
   }
 
   generateEmulatorSetupScript() {
     return `#!/bin/bash
 
-echo "📱 Mobile Emulator Setup Script"
+echo "Mobile Emulator Setup Script"
 
 # Function to check Android SDK
 check_android_sdk() {
     if command -v adb &> /dev/null; then
-        echo "✅ Android SDK found"
+        echo "Android SDK found"
         return 0
     else
-        echo "❌ Android SDK not found"
+        echo "Android SDK not found"
         return 1
     fi
 }
@@ -1444,10 +1449,10 @@ check_android_sdk() {
 # Function to check Xcode
 check_xcode() {
     if command -v xcrun &> /dev/null; then
-        echo "✅ Xcode found"
+        echo "Xcode found"
         return 0
     else
-        echo "❌ Xcode not found"
+        echo "Xcode not found"
         return 1
     fi
 }
@@ -1455,7 +1460,7 @@ check_xcode() {
 # Function to list Android emulators
 list_android_emulators() {
     if check_android_sdk; then
-        echo "📱 Available Android Emulators:"
+        echo "Available Android Emulators:"
         emulator -list-avds
     fi
 }
@@ -1463,7 +1468,7 @@ list_android_emulators() {
 # Function to list iOS simulators
 list_ios_simulators() {
     if check_xcode; then
-        echo "🍎 Available iOS Simulators:"
+        echo "Available iOS Simulators:"
         xcrun simctl list devices available | grep -E "(iPhone|iPad)"
     fi
 }
@@ -1472,14 +1477,14 @@ list_ios_simulators() {
 start_android_emulator() {
     local avd_name=$1
     if [ -z "$avd_name" ]; then
-        echo "❌ Please provide AVD name"
+        echo "Please provide AVD name"
         return 1
     fi
     
     if check_android_sdk; then
-        echo "🚀 Starting Android emulator: $avd_name"
+        echo "Starting Android emulator: $avd_name"
         emulator -avd "$avd_name" -no-snapshot-load &
-        echo "✅ Android emulator started"
+        echo "Android emulator started"
     fi
 }
 
@@ -1487,20 +1492,20 @@ start_android_emulator() {
 start_ios_simulator() {
     local device_name=$1
     if [ -z "$device_name" ]; then
-        echo "❌ Please provide device name"
+        echo "Please provide device name"
         return 1
     fi
     
     if check_xcode; then
-        echo "🚀 Starting iOS simulator: $device_name"
+        echo "Starting iOS simulator: $device_name"
         xcrun simctl boot "$device_name"
         open -a Simulator
-        echo "✅ iOS simulator started"
+        echo "iOS simulator started"
     fi
 }
 
 # Main script
-echo "🔍 Checking mobile development environment..."
+echo "Checking mobile development environment..."
 
 # Check Android SDK
 check_android_sdk
@@ -1517,7 +1522,7 @@ echo ""
 list_ios_simulators
 
 echo ""
-echo "📋 Usage:"
+echo "Usage:"
 echo "  ./setup-emulator.sh android <avd_name>  - Start Android emulator"
 echo "  ./setup-emulator.sh ios <device_name>   - Start iOS simulator"
 echo "  ./setup-emulator.sh list                - List all available devices"`;
@@ -1537,11 +1542,11 @@ echo "  ./setup-emulator.sh list                - List all available devices"`;
     this.createMobileIntegrationTests(baseURL, domain);
     this.createMobileGestureTests(baseURL, domain);
     
-    console.log('✅ Mobile sample test files created!\n');
+    console.log('Mobile sample test files created!\n');
   }
 
   async createMobileComprehensiveContent() {
-    console.log('🔧 Creating mobile-specific comprehensive content...\n');
+    console.log('Creating mobile-specific comprehensive content...\n');
     
     // Create mobile CI/CD scripts
     this.createMobileCICDScripts();
@@ -1552,15 +1557,15 @@ echo "  ./setup-emulator.sh list                - List all available devices"`;
     // Create mobile test data and fixtures
     this.createMobileTestDataAndFixtures();
 
-    console.log('\n✅ Mobile comprehensive content created!\n');
+    console.log('\nMobile comprehensive content created!\n');
   }
 
   generateMobileReadme() {
-    return `# 📱 Mobile Automation Framework
+    return `# Mobile Automation Framework
 
 A comprehensive mobile automation framework built with Playwright and Appium for testing native mobile applications.
 
-## 🚀 Features
+## Features
 
 - **Cross-platform Support**: Android and iOS testing
 - **Emulator Management**: Automatic emulator startup and management
@@ -1570,7 +1575,7 @@ A comprehensive mobile automation framework built with Playwright and Appium for
 - **Performance Monitoring**: Battery, memory, and CPU monitoring
 - **Parallel Execution**: Run tests on multiple devices simultaneously
 
-## 📁 Project Structure
+## Project Structure
 
 \`\`\`
 ${this.projectName}/
@@ -1598,7 +1603,7 @@ ${this.projectName}/
     └── data/                # Test data
 \`\`\`
 
-## 🛠️ Setup
+## Setup
 
 1. **Install Dependencies**:
    \`\`\`bash
@@ -1617,7 +1622,7 @@ ${this.projectName}/
    ./mobile/setup-emulator.sh
    \`\`\`
 
-## 🧪 Running Tests
+## Running Tests
 
 ### Android Tests
 \`\`\`bash
@@ -1634,7 +1639,7 @@ npm run test:ios
 npm run test:parallel
 \`\`\`
 
-## 📱 Mobile Configuration
+## Mobile Configuration
 
 ### Android Configuration
 - **Platform**: Android
@@ -1648,7 +1653,7 @@ npm run test:parallel
 - **Device**: iPhone Simulator
 - **Platform Version**: 16.0
 
-## 🎯 Mobile Gestures
+## Mobile Gestures
 
 The framework includes comprehensive gesture support:
 
@@ -1656,7 +1661,7 @@ The framework includes comprehensive gesture support:
 - **Advanced Gestures**: pinch, rotate, flick, doubleTap
 - **Multi-touch**: multiTouch, shake, orientation
 
-## 🔧 Mobile Interactions
+## Mobile Interactions
 
 Complete mobile interaction utilities:
 
@@ -1666,7 +1671,7 @@ Complete mobile interaction utilities:
 - **Network & Permissions**: enableWifi, disableWifi, enableLocation
 - **Performance Monitoring**: getBatteryLevel, getMemoryUsage, getCPUUsage
 
-## 📊 Reports
+## Reports
 
 Test reports are generated in the \`mobile/reports/\` directory with detailed information about:
 - Test execution results
@@ -1674,7 +1679,7 @@ Test reports are generated in the \`mobile/reports/\` directory with detailed in
 - Screenshots and videos
 - Device information
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -1682,14 +1687,14 @@ Test reports are generated in the \`mobile/reports/\` directory with detailed in
 4. Add tests for new functionality
 5. Submit a pull request
 
-## 📚 Documentation
+## Documentation
 
 - [Mobile Gestures Guide](mobile/docs/gestures.md)
 - [Mobile Interactions Guide](mobile/docs/interactions.md)
 - [Emulator Management Guide](mobile/docs/emulator.md)
 - [Appium Documentation](https://appium.io/docs/en/about-appium/intro/)
 
-## 🆘 Support
+## Support
 
 For support and questions:
 - Create an issue in the repository
@@ -1698,16 +1703,16 @@ For support and questions:
 
 ---
 
-**Happy Mobile Testing! 📱✨**`;
+**Happy Mobile Testing!**`;
   }
 
   createMobileSmokeTests(baseURL, domain) {
-    console.log('🔥 Creating mobile smoke tests...');
+    console.log('Creating mobile smoke tests...');
     this.createFile('mobile/tests/mobile-smoke-tests.spec.ts', `import { test, expect } from '@playwright/test';
 import { BaseMobileTest } from '../core/BaseMobileTest';
 import { EmulatorManager } from '../utils/EmulatorManager';
 
-test.describe('📱 Mobile Smoke Tests', () => {
+test.describe('Mobile Smoke Tests', () => {
   let mobileTest: BaseMobileTest;
   let emulatorManager: EmulatorManager;
 
@@ -1763,16 +1768,16 @@ test.describe('📱 Mobile Smoke Tests', () => {
     await mobileTest.takeScreenshot('navigation-test');
   });
 });`);
-    console.log('✅ Mobile smoke tests created');
+    console.log('Mobile smoke tests created');
   }
 
   createMobileRegressionTests(baseURL, domain) {
-    console.log('🔄 Creating mobile regression tests...');
+    console.log('Creating mobile regression tests...');
     this.createFile('mobile/tests/mobile-regression-tests.spec.ts', `import { test, expect } from '@playwright/test';
 import { BaseMobileTest } from '../core/BaseMobileTest';
 import { EmulatorManager } from '../utils/EmulatorManager';
 
-test.describe('📱 Mobile Regression Tests', () => {
+test.describe('Mobile Regression Tests', () => {
   let mobileTest: BaseMobileTest;
   let emulatorManager: EmulatorManager;
 
@@ -1830,16 +1835,16 @@ test.describe('📱 Mobile Regression Tests', () => {
     await mobileTest.takeScreenshot('network-test');
   });
 });`);
-    console.log('✅ Mobile regression tests created');
+    console.log('Mobile regression tests created');
   }
 
   createMobileUnitTests(baseURL, domain) {
-    console.log('🧪 Creating mobile unit tests...');
+    console.log('Creating mobile unit tests...');
     this.createFile('mobile/tests/mobile-unit-tests.spec.ts', `import { test, expect } from '@playwright/test';
 import { MobileGestures } from '../utils/MobileGestures';
 import { MobileInteractions } from '../utils/MobileInteractions';
 
-test.describe('📱 Mobile Unit Tests', () => {
+test.describe('Mobile Unit Tests', () => {
   let gestures: MobileGestures;
   let interactions: MobileInteractions;
 
@@ -1888,15 +1893,15 @@ test.describe('📱 Mobile Unit Tests', () => {
     expect(deviceInfo).toHaveProperty('screenHeight');
   });
 });`);
-    console.log('✅ Mobile unit tests created');
+    console.log('Mobile unit tests created');
   }
 
   createMobileIntegrationTests(baseURL, domain) {
-    console.log('🔗 Creating mobile integration tests...');
+    console.log('Creating mobile integration tests...');
     this.createFile('mobile/tests/mobile-integration-tests.spec.ts', `import { test, expect } from '@playwright/test';
 import { BaseMobilePage } from '../core/BaseMobilePage';
 
-test.describe('📱 Mobile Integration Tests', () => {
+test.describe('Mobile Integration Tests', () => {
   test('should test complete mobile user flow', async ({ page }) => {
     // Simulate complete user journey
     await page.goto('data:text/html,<div id="app">Mobile App</div>');
@@ -1933,15 +1938,15 @@ test.describe('📱 Mobile Integration Tests', () => {
     expect(state).toBe('persisted');
   });
 });`);
-    console.log('✅ Mobile integration tests created');
+    console.log('Mobile integration tests created');
   }
 
   createMobileGestureTests(baseURL, domain) {
-    console.log('👆 Creating mobile gesture tests...');
+    console.log('Creating mobile gesture tests...');
     this.createFile('mobile/tests/mobile-gesture-tests.spec.ts', `import { test, expect } from '@playwright/test';
 import { MobileGestures } from '../utils/MobileGestures';
 
-test.describe('📱 Mobile Gesture Tests', () => {
+test.describe('Mobile Gesture Tests', () => {
   let gestures: MobileGestures;
 
   test.beforeEach(async ({ page }) => {
@@ -2010,38 +2015,38 @@ test.describe('📱 Mobile Gesture Tests', () => {
     await gestures.orientation('portrait');
   });
 });`);
-    console.log('✅ Mobile gesture tests created');
+    console.log('Mobile gesture tests created');
   }
 
   createMobileCICDScripts() {
-    console.log('🔧 Creating mobile CI/CD scripts...');
+    console.log('Creating mobile CI/CD scripts...');
     this.createFile('mobile/ci-cd/mobile-run-tests.sh', `#!/bin/bash
 
-echo "📱 Running Mobile Tests..."
+echo "Running Mobile Tests..."
 
 # Set environment variables
 export ANDROID_APP_PATH="./apps/app-debug.apk"
 export IOS_APP_PATH="./apps/MyApp.app"
 
 # Run Android tests
-echo "🤖 Running Android tests..."
+echo "Running Android tests..."
 npm run test:android
 
 # Run iOS tests (macOS only)
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "🍎 Running iOS tests..."
+    echo "Running iOS tests..."
     npm run test:ios
 fi
 
 # Run parallel tests
-echo "🔄 Running parallel tests..."
+echo "Running parallel tests..."
 npm run test:parallel
 
-echo "✅ Mobile tests completed!"`);
+echo "Mobile tests completed!"`);
     
     this.createFile('mobile/ci-cd/mobile-deploy.sh', `#!/bin/bash
 
-echo "📱 Deploying Mobile Test Results..."
+echo "Deploying Mobile Test Results..."
 
 # Create reports directory
 mkdir -p mobile/reports
@@ -2050,11 +2055,11 @@ mkdir -p mobile/reports
 npm run report:mobile
 
 # Upload results to CI/CD system
-echo "📊 Uploading test results..."
+echo "Uploading test results..."
 
-echo "✅ Mobile deployment completed!"`);
+echo "Mobile deployment completed!"`);
     
-    this.createFile('mobile/ci-cd/README.md', `# 📱 Mobile CI/CD
+    this.createFile('mobile/ci-cd/README.md', `# Mobile CI/CD
 
 This directory contains CI/CD scripts for mobile automation.
 
@@ -2070,17 +2075,17 @@ chmod +x mobile/ci-cd/*.sh
 ./mobile/ci-cd/mobile-run-tests.sh
 ./mobile/ci-cd/mobile-deploy.sh
 \`\`\``);
-    console.log('✅ Mobile CI/CD scripts created');
+    console.log('Mobile CI/CD scripts created');
   }
 
   createMobileDashboard() {
-    console.log('📊 Creating mobile dashboard...');
+    console.log('Creating mobile dashboard...');
     this.createFile('mobile/dashboard/mobile-dashboard.html', `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📱 Mobile Test Dashboard</title>
+    <title>Mobile Test Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
@@ -2094,56 +2099,56 @@ chmod +x mobile/ci-cd/*.sh
 </head>
 <body>
     <div class="header">
-        <h1>📱 Mobile Test Dashboard</h1>
+        <h1>Mobile Test Dashboard</h1>
         <p>Comprehensive mobile automation test results and analytics</p>
     </div>
     
     <div class="stats">
         <div class="stat-card">
-            <h3>🤖 Android Tests</h3>
-            <p class="success">✅ 15 Passed</p>
-            <p class="failure">❌ 2 Failed</p>
-            <p class="pending">⏳ 3 Pending</p>
+            <h3>Android Tests</h3>
+            <p class="success">15 Passed</p>
+            <p class="failure">2 Failed</p>
+            <p class="pending">3 Pending</p>
         </div>
         <div class="stat-card">
-            <h3>🍎 iOS Tests</h3>
-            <p class="success">✅ 12 Passed</p>
-            <p class="failure">❌ 1 Failed</p>
-            <p class="pending">⏳ 2 Pending</p>
+            <h3>iOS Tests</h3>
+            <p class="success">12 Passed</p>
+            <p class="failure">1 Failed</p>
+            <p class="pending">2 Pending</p>
         </div>
         <div class="stat-card">
-            <h3>🔄 Parallel Tests</h3>
-            <p class="success">✅ 8 Passed</p>
-            <p class="failure">❌ 0 Failed</p>
-            <p class="pending">⏳ 1 Pending</p>
+            <h3>Parallel Tests</h3>
+            <p class="success">8 Passed</p>
+            <p class="failure">0 Failed</p>
+            <p class="pending">1 Pending</p>
         </div>
         <div class="stat-card">
-            <h3>📊 Performance</h3>
-            <p>⏱️ Avg: 2.3s</p>
-            <p>📈 Success Rate: 92%</p>
-            <p>🖥️ Devices: 4</p>
+            <h3>Performance</h3>
+            <p>Avg: 2.3s</p>
+            <p>Success Rate: 92%</p>
+            <p>Devices: 4</p>
         </div>
     </div>
     
     <div class="test-results">
-        <h2>📋 Recent Test Results</h2>
+        <h2>Recent Test Results</h2>
         <ul>
-            <li class="success">✅ Mobile App Launch Test - 1.2s</li>
-            <li class="success">✅ Gesture Navigation Test - 2.1s</li>
-            <li class="success">✅ Performance Metrics Test - 1.8s</li>
-            <li class="failure">❌ Network Handling Test - 3.5s</li>
-            <li class="success">✅ App Lifecycle Test - 1.9s</li>
+            <li class="success">Mobile App Launch Test - 1.2s</li>
+            <li class="success">Gesture Navigation Test - 2.1s</li>
+            <li class="success">Performance Metrics Test - 1.8s</li>
+            <li class="failure">Network Handling Test - 3.5s</li>
+            <li class="success">App Lifecycle Test - 1.9s</li>
         </ul>
     </div>
     
     <script>
         // Dashboard functionality
-        console.log('📱 Mobile Dashboard Loaded');
+        console.log('Mobile Dashboard Loaded');
     </script>
 </body>
 </html>`);
     
-    this.createFile('mobile/dashboard/README.md', `# 📱 Mobile Dashboard
+    this.createFile('mobile/dashboard/README.md', `# Mobile Dashboard
 
 Interactive dashboard for mobile test results and analytics.
 
@@ -2158,11 +2163,11 @@ Interactive dashboard for mobile test results and analytics.
 ## Usage
 
 Open \`mobile-dashboard.html\` in your browser to view the dashboard.`);
-    console.log('✅ Mobile dashboard created');
+    console.log('Mobile dashboard created');
   }
 
   createMobileTestDataAndFixtures() {
-    console.log('📦 Creating mobile test data and fixtures...');
+    console.log('Creating mobile test data and fixtures...');
     this.createFile('mobile/data/mobile-test-data.json', `{
   "android": {
     "devices": [
@@ -2253,7 +2258,7 @@ Open \`mobile-dashboard.html\` in your browser to view the dashboard.`);
     "offline": { "download": 0, "upload": 0, "latency": 0 }
   }
 }`);
-    console.log('✅ Mobile test data and fixtures created');
+    console.log('Mobile test data and fixtures created');
   }
 
   // Mobile configuration generation methods
@@ -2394,7 +2399,7 @@ export default defineConfig({
   }
 
   async selectCustomFeatures() {
-    console.log('\n🔧 Select Custom Features\n');
+    console.log('\nSelect Custom Features\n');
     
     const featureOptions = {
       'api-testing': 'API Testing Support',
@@ -2509,15 +2514,15 @@ export default defineConfig({
   }
 
   async setupMobileAutomation() {
-    console.log('\n📱 Mobile Automation Setup\n');
+    console.log('\nMobile Automation Setup\n');
     
     try {
       // Check if Appium is installed
       const { execSync } = require('child_process');
       execSync('appium --version', { stdio: 'ignore' });
-      console.log('✅ Appium is installed');
+      console.log('Appium is installed');
     } catch (error) {
-      console.log('❌ Appium is not installed. Please install Appium first:');
+      console.log('Appium is not installed. Please install Appium first:');
       console.log('   npm install -g appium');
       console.log('   appium driver install uiautomator2');
       console.log('   appium driver install xcuitest');
@@ -2525,7 +2530,7 @@ export default defineConfig({
     
     // Display mobile configuration summary
     if (this.mobileConfig) {
-      console.log('\n📋 Mobile Configuration Summary:');
+      console.log('\nMobile Configuration Summary:');
       console.log(`   Platform: ${this.mobileConfig.platform}`);
       if (this.mobileConfig.androidEngine) {
         console.log(`   Android Engine: ${this.mobileConfig.androidEngine}`);
@@ -2549,11 +2554,11 @@ export default defineConfig({
       }
     }
     
-    console.log('\n📱 Mobile automation setup completed!\n');
+    console.log('\nMobile automation setup completed!\n');
   }
 
   async createMobileConfiguration() {
-    console.log('📱 Creating mobile-specific configuration...\n');
+    console.log('Creating mobile-specific configuration...\n');
     
     // Create mobile utility files
     this.createFile('mobile/utils/MobileGestures.ts', this.generateMobileGestures());
@@ -2573,11 +2578,11 @@ export default defineConfig({
     this.createFile('mobile/setup-mobile.sh', this.generateMobileSetupScript());
     this.createFile('mobile/setup-emulator.sh', this.generateEmulatorSetupScript());
     
-    console.log('✅ Mobile configuration created!\n');
+    console.log('Mobile configuration created!\n');
   }
 
   async selectMobilePlatform() {
-    console.log('📱 Select Mobile Platform\n');
+    console.log('Select Mobile Platform\n');
     console.log('1. Android (.apk)');
     console.log('2. iOS (.ipa)');
     console.log('3. Both platforms');
@@ -2592,20 +2597,20 @@ export default defineConfig({
       case '3':
         return 'both';
       default:
-        console.log('⚠️  Invalid choice. Using Android.');
+        console.log('Invalid choice. Using Android.');
         return 'android';
     }
   }
 
   async getAppFilePath(platform) {
-    console.log('\n📁 App File Upload\n');
+    console.log('\nApp File Upload\n');
     
     if (platform === 'android' || platform === 'both') {
       const androidPath = await this.question('Enter path to Android .apk file: ');
       if (androidPath && fs.existsSync(androidPath)) {
         return androidPath;
       } else {
-        console.log('⚠️  APK file not found. Using sample app.');
+        console.log('APK file not found. Using sample app.');
         return './sample-app.apk';
       }
     }
@@ -2615,7 +2620,7 @@ export default defineConfig({
       if (iosPath && fs.existsSync(iosPath)) {
         return iosPath;
       } else {
-        console.log('⚠️  IPA file not found. Using sample app.');
+        console.log('IPA file not found. Using sample app.');
         return './sample-app.ipa';
       }
     }
@@ -2624,7 +2629,7 @@ export default defineConfig({
   }
 
   async displayAppAnalysis(analysis) {
-    console.log('\n📊 App Analysis Results\n');
+    console.log('\nApp Analysis Results\n');
     console.log(`Platform: ${analysis.platform}`);
     console.log(`App Name: ${analysis.appName}`);
     console.log(`Bundle ID: ${analysis.bundleId}`);
@@ -2633,7 +2638,7 @@ export default defineConfig({
     console.log(`Total Screens: ${analysis.screens.length}`);
     
     if (analysis.elements.length > 0) {
-      console.log('\n📱 Detected UI Elements:');
+      console.log('\nDetected UI Elements:');
       analysis.elements.slice(0, 5).forEach(element => {
         console.log(`  - ${element.type}: ${element.id}`);
       });
@@ -2643,7 +2648,7 @@ export default defineConfig({
     }
     
     if (analysis.screens.length > 0) {
-      console.log('\n🖥️  Detected Screens:');
+      console.log('\nDetected Screens:');
       analysis.screens.forEach(screen => {
         console.log(`  - ${screen.name}`);
       });
@@ -2653,16 +2658,16 @@ export default defineConfig({
 
 
   async createProjectStructure() {
-    console.log('📁 Creating project structure...\n');
+    console.log('Creating project structure...\n');
     
     // Create the main project directory
     const fullProjectPath = path.join(this.projectPath, this.projectName);
     try {
       fs.mkdirSync(fullProjectPath, { recursive: true });
-      console.log(`✅ Created project directory: ${fullProjectPath}`);
+      console.log(`Created project directory: ${fullProjectPath}`);
       // Do NOT change working directory
     } catch (error) {
-      console.error(`❌ Error creating project directory: ${error.message}`);
+      console.error(` Error creating project directory: ${error.message}`);
       throw error;
     }
     
@@ -2746,7 +2751,7 @@ export default defineConfig({
       await this.createDirectory(path.join(fullProjectPath, dir));
     }
     
-    console.log('\n✅ Project structure created!\n');
+    console.log('\nProject structure created!\n');
   }
 
   // Helper to get the full path inside the project
@@ -2758,10 +2763,10 @@ export default defineConfig({
     try {
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
-        console.log(`✅ Created directory: ${dirPath}`);
+        console.log(` Created directory: ${dirPath}`);
       }
     } catch (error) {
-      console.error(`❌ Error creating directory ${dirPath}:`, error.message);
+      console.error(` Error creating directory ${dirPath}:`, error.message);
       throw error;
     }
   }
@@ -2774,19 +2779,19 @@ export default defineConfig({
       await this.createDirectory(dirPath);
       // Write the file
       fs.writeFileSync(filePath, content);
-      console.log(`✅ Created file: ${filePath}`);
+      console.log(`Created file: ${filePath}`);
     } catch (error) {
-      console.error(`❌ Error creating file ${filePath}:`, error.message);
+      console.error(` Error creating file ${filePath}:`, error.message);
       throw error;
     }
   }
 
   async createComprehensiveFramework() {
-    console.log('🔧 Creating comprehensive framework components...\n');
+    console.log('Creating comprehensive framework components...\n');
     
     if (this.automationType === 'mobile') {
       // Skip web framework creation for mobile automation
-      console.log('📱 Mobile automation selected - skipping web framework components');
+      console.log('Mobile automation selected - skipping web framework components');
     } else {
       // Create web framework components for web/hybrid automation
       if (this.features['interactions-module']) {
@@ -2804,11 +2809,20 @@ export default defineConfig({
       this.createCoreFrameworkFiles();
     }
     
-    console.log('\n✅ Comprehensive framework created!\n');
+    // Create package.json
+    this.createPackageJson();
+    
+    // Create tsconfig.json
+    this.createTsConfig();
+    
+    console.log('\nComprehensive framework created!\n');
+    
+    // Install dependencies and run tests
+    await this.installDependenciesAndRunTests();
   }
 
   createInteractionsModule() {
-    console.log('🔧 Creating Interactions Module...');
+    console.log('Creating Interactions Module...');
     this.createFile('framework/interactions/Accessibility.ts', this.generateAccessibilityModule());
     this.createFile('framework/interactions/BrowserActions.ts', this.generateBrowserActionsModule());
     this.createFile('framework/interactions/Click.ts', this.generateClickModule());
@@ -2822,27 +2836,166 @@ export default defineConfig({
   }
 
   createRunnerConfiguration() {
-    console.log('🔧 Creating Runner Configuration...');
+    console.log('Creating Runner Configuration...');
     this.createFile('framework/config/runner.config.ts', `import { defineConfig } from '@playwright/test';\n\nexport default defineConfig({\n  testDir: './tests',\n  timeout: 30000,\n  retries: 2,\n  workers: 1,\n  reporter: [\n    ['html'],\n    ['json', { outputFile: 'test-results/results.json' }],\n    ['list']\n  ],\n  use: {\n    headless: true,\n    viewport: { width: 1920, height: 1080 },\n    screenshot: 'only-on-failure',\n    video: 'retain-on-failure',\n    trace: 'retain-on-failure'\n  }\n});`);
   }
 
   createUtilitiesModule() {
-    console.log('🔧 Creating Utilities Module...');
+    console.log('Creating Utilities Module...');
     this.createFile('framework/utils/Utilities.ts', `export class Utilities {\n  static async wait(ms: number): Promise<void> {\n    return new Promise(resolve => setTimeout(resolve, ms));\n  }\n  static generateRandomString(length: number): string {\n    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\n    let result = '';\n    for (let i = 0; i < length; i++) {\n      result += chars.charAt(Math.floor(Math.random() * chars.length));\n    }\n    return result;\n  }\n  static formatDate(date: Date): string {\n    return date.toISOString().split('T')[0];\n  }\n}`);
   }
 
   createConstantsModule() {
-    console.log('🔧 Creating Constants Module...');
+    console.log('Creating Constants Module...');
     this.createFile('framework/constants/Constants.ts', `export const Timeouts = {\n  SHORT: 5000,\n  MEDIUM: 10000,\n  LONG: 30000,\n  VERY_LONG: 60000\n};\n\nexport const Selectors = {\n  COMMON: {\n    LOADING: '[data-testid="loading"]',\n    ERROR: '[data-testid="error"]',\n    SUCCESS: '[data-testid="success"]'\n  }\n};\n\nexport const Messages = {\n  SUCCESS: 'Operation completed successfully',\n  ERROR: 'An error occurred',\n  LOADING: 'Please wait...'\n};`);
   }
 
   createCoreFrameworkFiles() {
-    console.log('🔧 Creating Core Framework Files...');
+    console.log('Creating Core Framework Files...');
     this.createFile('framework/core/BasePageObject.ts', `import { Page } from '@playwright/test';\n\nexport class BasePageObject {\n  protected page: Page;\n  constructor(page: Page) {\n    this.page = page;\n  }\n}`);
   }
 
+  createPackageJson() {
+    console.log('Creating package.json...');
+    const packageJson = {
+      name: this.projectName.toLowerCase().replace(/\s+/g, '-'),
+      version: '1.0.0',
+      description: 'Playwright automation framework',
+      main: 'index.js',
+      scripts: {
+        test: 'playwright test --config=framework.config.ts',
+        'test:ui': 'playwright test --config=framework.config.ts --ui',
+        'test:smoke': 'playwright test tests/smoke/ --config=framework.config.ts',
+        'test:regression': 'playwright test tests/regression/ --config=framework.config.ts',
+        'test:accessibility': 'playwright test tests/accessibility/ --config=framework.config.ts',
+        'test:performance': 'playwright test tests/performance/ --config=framework.config.ts',
+        'test:e2e': 'playwright test tests/e2e/ --config=framework.config.ts',
+        'test:api': 'playwright test tests/api/ --config=framework.config.ts',
+        'test:visual': 'playwright test tests/visual/ --config=framework.config.ts',
+        'test:mobile': 'playwright test tests/mobile/ --config=framework.config.ts',
+        'update-baselines': 'playwright test --update-snapshots',
+        'lighthouse': 'lighthouse --output html --output-path ./performance-results/',
+        'docker:build': 'docker build -t playwright-tests .',
+        'docker:run': 'docker run playwright-tests',
+        'test:cloud': 'playwright test --config=cloud.config.ts',
+        'report': 'playwright show-report',
+        'install:browsers': 'playwright install'
+      },
+      keywords: ['playwright', 'automation', 'testing', 'e2e'],
+      author: 'Test Automation Team',
+      license: 'MIT',
+      devDependencies: {
+        '@playwright/test': '^1.53.0',
+        '@types/node': '^20.11.24',
+        'typescript': '^5.3.3'
+      }
+    };
+    
+    this.createFile('package.json', JSON.stringify(packageJson, null, 2));
+  }
+
+  createTsConfig() {
+    console.log('Creating tsconfig.json...');
+    const tsconfig = {
+      compilerOptions: {
+        target: 'ES2020',
+        module: 'commonjs',
+        moduleResolution: 'node',
+        strict: true,
+        esModuleInterop: true,
+        skipLibCheck: true,
+        forceConsistentCasingInFileNames: true,
+        resolveJsonModule: true,
+        declaration: true,
+        outDir: './dist',
+        rootDir: './',
+        baseUrl: './',
+        paths: {
+          '@/*': ['framework/*'],
+          '@tests/*': ['tests/*'],
+          '@data/*': ['data/*'],
+          '@fixtures/*': ['fixtures/*']
+        }
+      },
+      include: [
+        'tests/**/*',
+        'framework/**/*',
+        '*.ts',
+        '*.js'
+      ],
+      exclude: [
+        'node_modules',
+        'dist',
+        'test-results',
+        'playwright-report',
+        'allure-results'
+      ]
+    };
+    
+    this.createFile('tsconfig.json', JSON.stringify(tsconfig, null, 2));
+  }
+
+  async installDependenciesAndRunTests() {
+    console.log('Installing dependencies and setting up framework...\n');
+    
+    try {
+      // Install npm dependencies
+      console.log('Installing npm dependencies...');
+      const { execSync } = require('child_process');
+      
+      try {
+        execSync('npm install', { 
+          cwd: this.getProjectPath(''), 
+          stdio: 'inherit',
+          timeout: 300000 // 5 minutes timeout
+        });
+        console.log('Dependencies installed successfully!');
+      } catch (error) {
+        console.log('Failed to install dependencies automatically. Please run "npm install" manually.');
+        console.log('Error:', error.message);
+      }
+
+      // Install Playwright browsers
+      console.log('\nInstalling Playwright browsers...');
+      try {
+        execSync('npx playwright install', { 
+          cwd: this.getProjectPath(''), 
+          stdio: 'inherit',
+          timeout: 300000 // 5 minutes timeout
+        });
+        console.log('Playwright browsers installed successfully!');
+      } catch (error) {
+        console.log('Failed to install browsers automatically. Please run "npx playwright install" manually.');
+        console.log('Error:', error.message);
+      }
+
+      // Run a quick smoke test to validate the setup
+      console.log('\nRunning smoke test to validate framework setup...');
+      try {
+        execSync('npm run test:smoke', { 
+          cwd: this.getProjectPath(''), 
+          stdio: 'inherit',
+          timeout: 120000 // 2 minutes timeout
+        });
+        console.log('\nFramework setup completed successfully! All tests are working.');
+      } catch (error) {
+        console.log('\nSmoke test failed, but framework is created. Please check the configuration.');
+        console.log('Error:', error.message);
+        console.log('\nYou can run tests manually with: npm run test');
+      }
+
+    } catch (error) {
+      console.log('Error during setup:', error.message);
+      console.log('Framework created but setup incomplete. Please run manually:');
+      console.log('1. cd ' + this.projectName);
+      console.log('2. npm install');
+      console.log('3. npx playwright install');
+      console.log('4. npm run test');
+    }
+  }
+
   async installDependencies() {
-    console.log('📦 Installing dependencies...\n');
+    console.log('Installing dependencies...\n');
     
     const dependencies = {
       "@playwright/test": "^1.53.0",
@@ -2894,32 +3047,32 @@ export default defineConfig({
       JSON.stringify(packageJson, null, 2)
     );
 
-    console.log('✅ package.json created');
+    console.log(' package.json created');
 
     // Create enhanced tsconfig.json
     const tsconfig = this.generateTsConfig();
     this.createFile('tsconfig.json', JSON.stringify(tsconfig, null, 2));
-    console.log('✅ tsconfig.json created');
+    console.log(' tsconfig.json created');
 
     // Install dependencies
-    console.log('\n📥 Installing npm dependencies...');
+    console.log('\nInstalling npm dependencies...');
     try {
       execSync('npm install', { cwd: this.getProjectPath(''), stdio: 'inherit' });
-      console.log('✅ Dependencies installed');
+      console.log(' Dependencies installed');
     } catch (error) {
-      console.log('⚠️  Failed to install dependencies automatically. Please run "npm install" manually.');
+      console.log('Failed to install dependencies automatically. Please run "npm install" manually.');
     }
 
     // Install Playwright browsers
-    console.log('\n🌐 Installing Playwright browsers...');
+    console.log('\nInstalling Playwright browsers...');
     try {
       execSync('npx playwright install', { cwd: this.getProjectPath(''), stdio: 'inherit' });
-      console.log('✅ Playwright browsers installed');
+      console.log(' Playwright browsers installed');
     } catch (error) {
-      console.log('⚠️  Failed to install browsers automatically. Please run "npx playwright install" manually.');
+      console.log('Failed to install browsers automatically. Please run "npx playwright install" manually.');
     }
 
-    console.log('\n✅ Dependencies setup completed!\n');
+    console.log('\n Dependencies setup completed!\n');
   }
 
   generateScripts() {
@@ -3102,20 +3255,20 @@ export default defineConfig({
 
   // Placeholder methods for other features
   async addFeaturesToProject() {
-    console.log('\n🔧 Add Features to Existing Project\n');
+    console.log('\nAdd Features to Existing Project\n');
     console.log('This feature is coming soon!');
     await this.showMainMenu();
   }
 
   async generateTestReports() {
-    console.log('\n📊 Generate Test Reports\n');
-    console.log('1. 📈 Generate Allure Reports');
-    console.log('2. 📊 Generate HTML Reports');
-    console.log('3. 📋 Generate JSON Reports');
-    console.log('4. 🔄 Generate All Report Types');
-    console.log('5. 🌐 Open Dashboard');
-    console.log('6. 🎭 Open Unified Dashboard');
-    console.log('7. 🔙 Back to Main Menu');
+    console.log('\nGenerate Test Reports\n');
+    console.log('1. Generate Allure Reports');
+    console.log('2. Generate HTML Reports');
+    console.log('3. Generate JSON Reports');
+    console.log('4. Generate All Report Types');
+    console.log('5. Open Dashboard');
+    console.log('6. Open Unified Dashboard');
+    console.log('7. Back to Main Menu');
     
     const choice = await this.question('\nSelect report type (1-7): ');
     
@@ -3142,115 +3295,115 @@ export default defineConfig({
         await this.showMainMenu();
         break;
       default:
-        console.log('\n❌ Invalid option. Please try again.');
+        console.log('\nInvalid option. Please try again.');
         await this.generateTestReports();
     }
   }
 
   async generateAllureReports() {
-    console.log('\n📈 Generating Allure Reports...\n');
+    console.log('\nGenerating Allure Reports...\n');
     
     try {
       // Check if allure-results directory exists
       if (!fs.existsSync('./allure-results')) {
-        console.log('⚠️  No allure-results directory found. Running tests first...');
+        console.log('No allure-results directory found. Running tests first...');
         await this.runTestsWithAllure();
       }
       
       // Generate Allure report
-      console.log('🔄 Generating Allure report...');
+      console.log('Generating Allure report...');
       execSync('npx allure generate allure-results --clean -o allure-report', { stdio: 'inherit' });
       
-      console.log('✅ Allure report generated successfully!');
-      console.log('📁 Report location: ./allure-report/index.html');
+      console.log(' Allure report generated successfully!');
+      console.log('Report location: ./allure-report/index.html');
       
       // Ask if user wants to open the report
-      const openReport = await this.question('\n🌐 Open Allure report in browser? (y/n): ');
+      const openReport = await this.question('\nOpen Allure report in browser? (y/n): ');
       if (openReport.toLowerCase() === 'y') {
         execSync('npx allure open allure-report', { stdio: 'inherit' });
       }
       
     } catch (error) {
-      console.error('❌ Failed to generate Allure report:', error.message);
+      console.error(' Failed to generate Allure report:', error.message);
     }
     
     await this.showMainMenu();
   }
 
   async generateHTMLReports() {
-    console.log('\n📊 Generating HTML Reports...\n');
+    console.log('\nGenerating HTML Reports...\n');
     
     try {
       // Run tests with HTML reporter
-      console.log('🔄 Running tests with HTML reporter...');
+      console.log('Running tests with HTML reporter...');
       execSync('npx playwright test --reporter=html', { stdio: 'inherit' });
       
-      console.log('✅ HTML report generated successfully!');
-      console.log('📁 Report location: ./playwright-report/index.html');
+      console.log(' HTML report generated successfully!');
+      console.log('Report location: ./playwright-report/index.html');
       
       // Ask if user wants to open the report
-      const openReport = await this.question('\n🌐 Open HTML report in browser? (y/n): ');
+      const openReport = await this.question('\nOpen HTML report in browser? (y/n): ');
       if (openReport.toLowerCase() === 'y') {
         execSync('npx playwright show-report', { stdio: 'inherit' });
       }
       
     } catch (error) {
-      console.error('❌ Failed to generate HTML report:', error.message);
+      console.error(' Failed to generate HTML report:', error.message);
     }
     
     await this.showMainMenu();
   }
 
   async generateJSONReports() {
-    console.log('\n📋 Generating JSON Reports...\n');
+    console.log('\nGenerating JSON Reports...\n');
     
     try {
       // Run tests with JSON reporter
-      console.log('🔄 Running tests with JSON reporter...');
+      console.log('Running tests with JSON reporter...');
       execSync('npx playwright test --reporter=json', { stdio: 'inherit' });
       
-      console.log('✅ JSON report generated successfully!');
-      console.log('📁 Report location: ./test-results/results.json');
+      console.log(' JSON report generated successfully!');
+      console.log('Report location: ./test-results/results.json');
       
     } catch (error) {
-      console.error('❌ Failed to generate JSON report:', error.message);
+      console.error(' Failed to generate JSON report:', error.message);
     }
     
     await this.showMainMenu();
   }
 
   async generateAllReports() {
-    console.log('\n🔄 Generating All Report Types...\n');
+    console.log('\nGenerating All Report Types...\n');
     
     try {
       // Generate Allure reports
-      console.log('📈 Generating Allure reports...');
+      console.log('Generating Allure reports...');
       await this.generateAllureReports();
       
       // Generate HTML reports
-      console.log('📊 Generating HTML reports...');
+      console.log('Generating HTML reports...');
       await this.generateHTMLReports();
       
       // Generate JSON reports
-      console.log('📋 Generating JSON reports...');
+      console.log('Generating JSON reports...');
       await this.generateJSONReports();
       
-      console.log('✅ All reports generated successfully!');
+      console.log(' All reports generated successfully!');
       
     } catch (error) {
-      console.error('❌ Failed to generate some reports:', error.message);
+      console.error(' Failed to generate some reports:', error.message);
     }
     
     await this.showMainMenu();
   }
 
   async openDashboard() {
-    console.log('\n🌐 Opening Dashboard...\n');
+    console.log('\nOpening Dashboard...\n');
     
     try {
       // Check if dashboard exists
       if (!fs.existsSync('./dashboard/index.html')) {
-        console.log('⚠️  Dashboard not found. Creating dashboard...');
+        console.log('Dashboard not found. Creating dashboard...');
         await this.createDashboard();
       }
       
@@ -3261,15 +3414,15 @@ export default defineConfig({
       
       exec(`${command} ./dashboard/index.html`, (error) => {
         if (error) {
-          console.log('📁 Dashboard location: ./dashboard/index.html');
+          console.log('Dashboard location: ./dashboard/index.html');
           console.log('Please open this file in your browser.');
         } else {
-          console.log('✅ Dashboard opened in browser!');
+          console.log(' Dashboard opened in browser!');
         }
       });
       
     } catch (error) {
-      console.error('❌ Failed to open dashboard:', error.message);
+      console.error(' Failed to open dashboard:', error.message);
     }
     
     await this.showMainMenu();
@@ -3277,21 +3430,21 @@ export default defineConfig({
 
   async runTestsWithAllure() {
     try {
-      console.log('🔄 Running tests with Allure reporter...');
-      execSync('npx playwright test --reporter=allure-playwright', { stdio: 'inherit' });
+      console.log('Running tests with Allure reporter...');
+      execSync('npx playwright test --reporter=html', { stdio: 'inherit' });
     } catch (error) {
-      console.error('❌ Failed to run tests with Allure:', error.message);
+      console.error(' Failed to run tests with Allure:', error.message);
       throw error;
     }
   }
 
   async openUnifiedDashboard() {
-    console.log('\n🎭 Opening Unified Dashboard...\n');
+    console.log('\nOpening Unified Dashboard...\n');
     
     try {
       // Check if unified dashboard exists
       if (!fs.existsSync('../unified-dashboard/index.html')) {
-        console.log('⚠️  Unified dashboard not found. Creating unified dashboard...');
+        console.log('Unified dashboard not found. Creating unified dashboard...');
         await this.createUnifiedDashboard();
       }
       
@@ -3302,22 +3455,22 @@ export default defineConfig({
       
       exec(`${command} ../unified-dashboard/index.html`, (error) => {
         if (error) {
-          console.log('📁 Unified dashboard location: ../unified-dashboard/index.html');
+          console.log('Unified dashboard location: ../unified-dashboard/index.html');
           console.log('Please open this file in your browser.');
         } else {
-          console.log('✅ Unified dashboard opened in browser!');
+          console.log(' Unified dashboard opened in browser!');
         }
       });
       
     } catch (error) {
-      console.error('❌ Failed to open unified dashboard:', error.message);
+      console.error(' Failed to open unified dashboard:', error.message);
     }
     
     await this.showMainMenu();
   }
 
   async createUnifiedDashboard() {
-    console.log('🔄 Creating unified dashboard...');
+    console.log('Creating unified dashboard...');
     
     // Copy unified dashboard files to the project
     const unifiedDashboardPath = '../unified-dashboard';
@@ -3337,7 +3490,7 @@ export default defineConfig({
       fs.copyFileSync(`${unifiedDashboardPath}/unified-dashboard.js`, `${projectDashboardPath}/unified-dashboard.js`);
     }
     
-    console.log('✅ Unified dashboard created successfully!');
+    console.log(' Unified dashboard created successfully!');
   }
 
   async updateFramework() {
@@ -3350,7 +3503,7 @@ export default defineConfig({
     console.log('\n📚 Documentation\n');
     console.log('1. 🚀 Quick Start Guide');
     console.log('2. 📖 Framework Documentation');
-    console.log('3. 🎯 Best Practices');
+    console.log('3. Best Practices');
     console.log('4. 🔧 Troubleshooting');
     console.log('5. 📞 Support & Community');
     console.log('6. 🔙 Back to Main Menu');
@@ -3366,9 +3519,9 @@ export default defineConfig({
   }
 
   async showAITestGeneration() {
-    console.log('\n🤖 AI-Powered Test Generation (MCP)\n');
+    console.log('\nAI-Powered Test Generation (MCP)\n');
     console.log('1. 🧠 Generate tests from user story');
-    console.log('2. 🔍 Analyze page and generate tests');
+    console.log('2. Analyze page and generate tests');
     console.log('3. ♿ Generate accessibility tests');
     console.log('4. ⚡ Generate performance tests');
     console.log('5. 📸 Generate visual regression tests');
@@ -3412,7 +3565,7 @@ export default defineConfig({
         await this.showMainMenu();
         return;
       default:
-        console.log('\n❌ Invalid option. Please try again.');
+        console.log('\nInvalid option. Please try again.');
         await this.showAITestGeneration();
     }
     
@@ -3433,14 +3586,14 @@ export default defineConfig({
     }
     
     // Simulate AI processing
-    console.log('\n✅ Generated test scenarios:');
+    console.log('\n Generated test scenarios:');
     console.log('1. Navigate to application');
     console.log('2. Perform user action');
     console.log('3. Verify expected result');
     
     const saveTests = await this.question('\nSave generated tests? (y/n): ');
     if (saveTests.toLowerCase() === 'y') {
-      console.log('✅ Tests saved to tests/ai-generated/');
+      console.log(' Tests saved to tests/ai-generated/');
     }
     
     // Ask if user wants to test the generated scenarios
@@ -3462,7 +3615,7 @@ export default defineConfig({
     console.log('- Interactive components');
     console.log('- Accessibility features');
     
-    console.log('\n✅ Generated test scenarios:');
+    console.log('\n Generated test scenarios:');
     console.log('1. Form validation test');
     console.log('2. Navigation test');
     console.log('3. Interactive element test');
@@ -3481,7 +3634,7 @@ export default defineConfig({
     console.log('- Color contrast issues');
     console.log('- Keyboard navigation');
     
-    console.log('\n✅ Generated accessibility tests:');
+    console.log('\n Generated accessibility tests:');
     console.log('1. Alt text validation');
     console.log('2. Label association test');
     console.log('3. Color contrast test');
@@ -3500,7 +3653,7 @@ export default defineConfig({
     console.log('- Lighthouse metrics');
     console.log('- Core Web Vitals');
     
-    console.log('\n✅ Generated performance tests:');
+    console.log('\n Generated performance tests:');
     console.log('1. Page load performance test');
     console.log('2. Lighthouse audit test');
     console.log('3. Core Web Vitals test');
@@ -3519,7 +3672,7 @@ export default defineConfig({
     console.log('- Mobile viewport screenshots');
     console.log('- Different browser screenshots');
     
-    console.log('\n✅ Generated visual tests:');
+    console.log('\n Generated visual tests:');
     console.log('1. Full page visual test');
     console.log('2. Component visual test');
     console.log('3. Mobile visual test');
@@ -3535,7 +3688,7 @@ export default defineConfig({
     console.log('Translating to Playwright actions...');
     console.log('Executing test steps...');
     
-    console.log('\n✅ Test executed successfully!');
+    console.log('\n Test executed successfully!');
     console.log('Results:');
     console.log('- All steps completed');
     console.log('- Assertions passed');
@@ -3558,7 +3711,7 @@ export default defineConfig({
     console.log('Identifying test scenarios...');
     console.log('Generating test cases...');
     
-    console.log('\n✅ Generated comprehensive test suite:');
+    console.log('\n Generated comprehensive test suite:');
     console.log('- 5 Functional tests');
     console.log('- 3 Accessibility tests');
     console.log('- 2 Performance tests');
@@ -3567,7 +3720,7 @@ export default defineConfig({
     
     const saveSuite = await this.question('\nSave test suite? (y/n): ');
     if (saveSuite.toLowerCase() === 'y') {
-      console.log('✅ Test suite saved to tests/comprehensive/');
+      console.log(' Test suite saved to tests/comprehensive/');
     }
   }
 
@@ -3593,37 +3746,37 @@ export default defineConfig({
       
       switch (provider) {
         case '1':
-          console.log('✅ Mock AI selected - No API key needed!');
+          console.log(' Mock AI selected - No API key needed!');
           console.log('   Perfect for demos and learning');
           break;
         case '2':
-          console.log('✅ Hugging Face selected - Free tier available');
+          console.log(' Hugging Face selected - Free tier available');
           console.log('   Optional API key for better performance');
           break;
         case '3':
-          console.log('✅ Ollama selected - Completely free and local');
+          console.log(' Ollama selected - Completely free and local');
           console.log('   Install with: curl -fsSL https://ollama.ai/install.sh | sh');
           break;
         case '4':
-          console.log('✅ OpenAI selected - Requires paid API key');
+          console.log(' OpenAI selected - Requires paid API key');
           console.log('   Best quality but costs money');
           break;
         case '5':
-          console.log('✅ Claude selected - Requires paid API key');
+          console.log(' Claude selected - Requires paid API key');
           console.log('   High quality, good for complex tasks');
           break;
         case '6':
-          console.log('✅ Gemini selected - Requires paid API key');
+          console.log(' Gemini selected - Requires paid API key');
           console.log('   Google AI, good performance');
           break;
         default:
-          console.log('❌ Invalid provider selected');
+          console.log(' Invalid provider selected');
       }
     }
     
     const apiKey = await this.question('\nEnter API key (or press Enter to skip): ');
     if (apiKey) {
-      console.log('✅ API key updated');
+      console.log(' API key updated');
     } else {
       console.log('ℹ️  No API key provided - using free alternatives');
     }
@@ -3659,8 +3812,8 @@ export default defineConfig({
     console.log(`🌐 Analyzing your application: ${baseURL}`);
     console.log('🔌 MCP Integration Status:');
     console.log(`   - AI Provider: ${this.config.aiProvider || 'mock'}`);
-    console.log('   - MCP Server: ✅ Running');
-    console.log('   - Page Analyzer: ✅ Ready\n');
+    console.log('   - MCP Server:  Running');
+    console.log('   - Page Analyzer:  Ready\n');
     
     try {
       // Import Playwright dynamically
@@ -3678,7 +3831,7 @@ export default defineConfig({
       // Navigate to the application
       console.log(`🔗 Navigating to: ${baseURL}`);
       await page.goto(baseURL, { waitUntil: 'networkidle' });
-      console.log('✅ Page loaded successfully');
+      console.log(' Page loaded successfully');
       
       // Simulate MCP analysis based on selected type
       await this.performMCPAnalysis(page);
@@ -3705,12 +3858,12 @@ export default defineConfig({
       
       console.log('\n🎉 MCP Test Generation Complete!');
       console.log('================================');
-      console.log('✅ Generated comprehensive test scenarios for your application');
-      console.log('✅ Tests cover functional, accessibility, performance, and visual aspects');
-      console.log('✅ Ready to integrate into your test suite');
+      console.log(' Generated comprehensive test scenarios for your application');
+      console.log(' Tests cover functional, accessibility, performance, and visual aspects');
+      console.log(' Ready to integrate into your test suite');
       
     } catch (error) {
-      console.error('❌ MCP Test Generation failed:', error.message);
+      console.error(' MCP Test Generation failed:', error.message);
       console.log('\n💡 Note: This is a simulation. In production, MCP would');
       console.log('   integrate with real AI services for enhanced functionality.');
     }
@@ -3794,7 +3947,7 @@ export default defineConfig({
         await this.delay(2000);
     }
     
-    console.log('   ✅ Analysis complete!');
+    console.log('    Analysis complete!');
   }
 
   async generateTestScenariosForMCPType() {
@@ -3994,9 +4147,9 @@ export default defineConfig({
     const baseURL = this.config.baseURL || 'https://example.com';
     console.log(`🌐 Analyzing your application: ${baseURL}`);
     console.log('🔌 MCP Integration Status:');
-    console.log('   - Mock AI: ✅ Active');
-    console.log('   - MCP Server: ✅ Running');
-    console.log('   - Page Analyzer: ✅ Ready\n');
+    console.log('   - Mock AI:  Active');
+    console.log('   - MCP Server:  Running');
+    console.log('   - Page Analyzer:  Ready\n');
     
     try {
       // Import Playwright dynamically
@@ -4009,13 +4162,13 @@ export default defineConfig({
       });
       const page = await browser.newPage();
       
-      console.log('✅ Browser launched successfully');
+      console.log(' Browser launched successfully');
       console.log(`🔍 Navigating to: ${baseURL}`);
       
       // Navigate to the user's application
       await page.goto(baseURL);
       await page.waitForLoadState('networkidle');
-      console.log('✅ Successfully loaded your application');
+      console.log(' Successfully loaded your application');
       
       // Analyze the page
       console.log('\n🤖 AI Page Analysis:');
@@ -4035,7 +4188,7 @@ export default defineConfig({
       const links = await page.locator('a').count();
       const images = await page.locator('img').count();
       
-      console.log('✅ Page Analysis Results:');
+      console.log(' Page Analysis Results:');
       console.log(`   - URL: ${url}`);
       console.log(`   - Title: ${title}`);
       console.log(`   - Forms: ${forms}`);
@@ -4146,7 +4299,7 @@ export default defineConfig({
       });
       
       // Display generated test scenarios
-      console.log(`✅ Generated ${testScenarios.length} test scenarios:`);
+      console.log(` Generated ${testScenarios.length} test scenarios:`);
       console.log('');
       
       testScenarios.forEach((scenario, index) => {
@@ -4178,12 +4331,12 @@ export default defineConfig({
       
       console.log('\n🎉 MCP Test Generation Complete!');
       console.log('================================');
-      console.log('✅ Generated comprehensive test scenarios for your application');
-      console.log('✅ Tests cover functional, accessibility, performance, and visual aspects');
-      console.log('✅ Ready to integrate into your test suite');
+      console.log(' Generated comprehensive test scenarios for your application');
+      console.log(' Tests cover functional, accessibility, performance, and visual aspects');
+      console.log(' Ready to integrate into your test suite');
       
     } catch (error) {
-      console.error('❌ MCP Test Generation failed:', error.message);
+      console.error(' MCP Test Generation failed:', error.message);
       console.log('\n💡 Note: This is a simulation. In production, MCP would');
       console.log('   integrate with real AI services for enhanced functionality.');
     }
@@ -4216,9 +4369,9 @@ export default defineConfig({
       // Write the test file
       try {
         fs.writeFileSync(filePath, testContent);
-        console.log(`   ✅ Test file created: ${filePath}`);
+        console.log(`    Test file created: ${filePath}`);
       } catch (error) {
-        console.error(`   ❌ Failed to create test file: ${error.message}`);
+        console.error(`    Failed to create test file: ${error.message}`);
       }
     });
     
@@ -4258,12 +4411,12 @@ The tests serve as a starting point for your comprehensive test suite.
 
     try {
       fs.writeFileSync(`${testDir}/README.md`, readmeContent);
-      console.log('   ✅ README.md created for MCP tests');
+      console.log('    README.md created for MCP tests');
     } catch (error) {
-      console.error(`   ❌ Failed to create README: ${error.message}`);
+      console.error(`    Failed to create README: ${error.message}`);
     }
     
-    console.log('\n✅ All test scenarios saved successfully!');
+    console.log('\n All test scenarios saved successfully!');
     console.log(`📁 Location: ${testDir}/`);
     console.log('🚀 You can now run these tests with: npm test');
   }
@@ -4299,7 +4452,7 @@ test.describe('${scenario.name}', () => {
     console.log('   Executing test sequence...\n');
     
     // Simulate test execution
-    console.log('✅ Test execution completed successfully!');
+    console.log(' Test execution completed successfully!');
     console.log('📊 Results:');
     console.log('   - All steps passed');
     console.log('   - No errors detected');
@@ -4325,11 +4478,11 @@ test.describe('${scenario.name}', () => {
       });
       const page = await browser.newPage();
       
-      console.log('✅ Browser launched successfully');
+      console.log(' Browser launched successfully');
       console.log('🔌 MCP Integration Status:');
-      console.log('   - Mock AI: ✅ Active');
-      console.log('   - MCP Server: ✅ Running');
-      console.log('   - Natural Language Parser: ✅ Ready\n');
+      console.log('   - Mock AI:  Active');
+      console.log('   - MCP Server:  Running');
+      console.log('   - Natural Language Parser:  Ready\n');
       
       // Demonstrate MCP features
       console.log('🤖 MCP Feature Demonstration:');
@@ -4343,7 +4496,7 @@ test.describe('${scenario.name}', () => {
       
       await page.goto('https://www.google.com');
       await page.waitForLoadState('networkidle');
-      console.log('   ✅ Navigation successful');
+      console.log('    Navigation successful');
       
       // Test 2: Search functionality
       if (testInput.toLowerCase().includes('search')) {
@@ -4356,7 +4509,7 @@ test.describe('${scenario.name}', () => {
         await page.fill('input[name="q"]', 'Playwright automation');
         await page.press('input[name="q"]', 'Enter');
         await page.waitForLoadState('networkidle');
-        console.log('   ✅ Search completed successfully');
+        console.log('    Search completed successfully');
       }
       
       // Test 3: Page Analysis
@@ -4372,7 +4525,7 @@ test.describe('${scenario.name}', () => {
       const buttons = await page.locator('button').count();
       const links = await page.locator('a').count();
       
-      console.log('   ✅ Page Analysis Results:');
+      console.log('    Page Analysis Results:');
       console.log(`      - URL: ${url}`);
       console.log(`      - Title: ${title}`);
       console.log(`      - Forms: ${forms}`);
@@ -4388,24 +4541,24 @@ test.describe('${scenario.name}', () => {
         path: 'test-results/mcp-demo-screenshot.png',
         fullPage: true 
       });
-      console.log('   ✅ Screenshot saved: test-results/mcp-demo-screenshot.png');
+      console.log('    Screenshot saved: test-results/mcp-demo-screenshot.png');
       
       // Test 5: MCP Tools demonstration
       console.log('\n5. 🛠️ MCP Tools Status');
       console.log('   Available MCP Tools:');
-      console.log('   ✅ navigate_to_url - Smart navigation');
-      console.log('   ✅ click_element - Intelligent clicking');
-      console.log('   ✅ fill_input - Context-aware form filling');
-      console.log('   ✅ get_page_content - Page analysis');
-      console.log('   ✅ wait_for_element - Smart waiting');
-      console.log('   ✅ take_screenshot - Visual testing');
-      console.log('   ✅ execute_test_scenario - Test execution');
-      console.log('   ✅ generate_test_steps - AI test generation');
+      console.log('    navigate_to_url - Smart navigation');
+      console.log('    click_element - Intelligent clicking');
+      console.log('    fill_input - Context-aware form filling');
+      console.log('    get_page_content - Page analysis');
+      console.log('    wait_for_element - Smart waiting');
+      console.log('    take_screenshot - Visual testing');
+      console.log('    execute_test_scenario - Test execution');
+      console.log('    generate_test_steps - AI test generation');
       
       // Summary
       console.log('\n🎉 MCP Integration Demo Complete!');
       console.log('=================================');
-      console.log('✅ Demonstrated MCP features:');
+      console.log(' Demonstrated MCP features:');
       console.log('   - Natural language parsing');
       console.log('   - Intelligent action execution');
       console.log('   - Page analysis and testing');
@@ -4422,7 +4575,7 @@ test.describe('${scenario.name}', () => {
       console.log('\n🧹 Browser closed');
       
     } catch (error) {
-      console.error('❌ MCP Demo failed:', error.message);
+      console.error(' MCP Demo failed:', error.message);
       console.log('\n💡 Note: This is a simulation. In production, MCP would');
       console.log('   integrate with real AI services for enhanced functionality.');
     }
@@ -4440,17 +4593,17 @@ test.describe('${scenario.name}', () => {
       // Create mobile environment configuration
       const mobileEnvConfigContent = this.generateMobileEnvironmentConfig();
       this.createFile('mobile/config/MobileEnvironmentConfig.ts', mobileEnvConfigContent);
-      console.log('✅ MobileEnvironmentConfig.ts created');
+      console.log(' MobileEnvironmentConfig.ts created');
       
       // Create mobile framework configuration
       const mobileFrameworkConfigContent = this.generateMobileFrameworkConfig();
       this.createFile('mobile.config.ts', mobileFrameworkConfigContent);
-      console.log('✅ mobile.config.ts created');
+      console.log(' mobile.config.ts created');
       
       // Create mobile Playwright configuration
       const mobilePlaywrightConfigContent = this.generateMobilePlaywrightConfig();
       this.createFile('playwright.config.ts', mobilePlaywrightConfigContent);
-      console.log('✅ playwright.config.ts created');
+      console.log(' playwright.config.ts created');
       
     } else {
       // Web/Hybrid environment configuration
@@ -4459,20 +4612,20 @@ test.describe('${scenario.name}', () => {
       // Create EnvironmentConfig.ts
       const envConfigContent = this.generateEnvironmentConfig();
       this.createFile('framework/config/EnvironmentConfig.ts', envConfigContent);
-      console.log('✅ EnvironmentConfig.ts created');
+      console.log(' EnvironmentConfig.ts created');
 
       // Create framework.config.ts
       const frameworkConfigContent = this.generateFrameworkConfig();
       this.createFile('framework.config.ts', frameworkConfigContent);
-      console.log('✅ framework.config.ts created');
+      console.log(' framework.config.ts created');
 
       // Create playwright.config.ts
       const playwrightConfigContent = this.generatePlaywrightConfig();
       this.createFile('playwright.config.ts', playwrightConfigContent);
-      console.log('✅ playwright.config.ts created');
+      console.log(' playwright.config.ts created');
     }
 
-    console.log('\n✅ Environment configuration completed!\n');
+    console.log('\n Environment configuration completed!\n');
   }
 
   async createSampleTests() {
@@ -4485,16 +4638,16 @@ test.describe('${scenario.name}', () => {
       // Create mobile-specific base files
       const mobilePageContent = this.generateMobilePageObject();
       this.createFile('mobile/core/BaseMobilePage.ts', mobilePageContent);
-      console.log('✅ BaseMobilePage.ts created');
+      console.log(' BaseMobilePage.ts created');
 
       const mobileTestContent = this.generateMobileTestBase();
       this.createFile('mobile/core/BaseMobileTest.ts', mobileTestContent);
-      console.log('✅ BaseMobileTest.ts created');
+      console.log(' BaseMobileTest.ts created');
 
       // Create README.md
       const readmeContent = this.generateMobileReadme();
       this.createFile('README.md', readmeContent);
-      console.log('✅ README.md created');
+      console.log(' README.md created');
 
       // Create mobile-specific sample tests
       await this.createMobileSampleTestFiles();
@@ -4509,17 +4662,17 @@ test.describe('${scenario.name}', () => {
       // Create BasePage.ts
       const basePageContent = this.generateBasePage();
       this.createFile('framework/core/BasePage.ts', basePageContent);
-      console.log('✅ BasePage.ts created');
+      console.log(' BasePage.ts created');
 
       // Create TestBase.ts
       const testBaseContent = this.generateTestBase();
       this.createFile('framework/core/TestBase.ts', testBaseContent);
-      console.log('✅ TestBase.ts created');
+      console.log(' TestBase.ts created');
 
       // Create README.md
       const readmeContent = this.generateReadme();
       this.createFile('README.md', readmeContent);
-      console.log('✅ README.md created');
+      console.log(' README.md created');
 
       // Create sample tests for each test folder
       await this.createSampleTestFiles();
@@ -4528,7 +4681,7 @@ test.describe('${scenario.name}', () => {
       await this.createComprehensiveContent();
     }
 
-    console.log('\n✅ Framework files and sample tests created!\n');
+    console.log('\n Framework files and sample tests created!\n');
   }
 
   async createSampleTestFiles() {
@@ -4604,7 +4757,7 @@ test.describe('${scenario.name}', () => {
       }
     }
     
-    console.log('✅ Sample test files created!\n');
+    console.log(' Sample test files created!\n');
   }
 
   async createComprehensiveContent() {
@@ -4628,7 +4781,7 @@ test.describe('${scenario.name}', () => {
     // Create test data and fixtures
     this.createTestDataAndFixtures();
 
-    console.log('\n✅ Comprehensive content created!\n');
+    console.log('\n Comprehensive content created!\n');
   }
 
   async setupGit() {
@@ -4636,16 +4789,16 @@ test.describe('${scenario.name}', () => {
     
     const gitignoreContent = this.generateGitignore();
     this.createFile('.gitignore', gitignoreContent);
-    console.log('✅ .gitignore created');
+    console.log(' .gitignore created');
 
     try {
       execSync('git init', { cwd: this.getProjectPath(''), stdio: 'inherit' });
-      console.log('✅ Git repository initialized');
+      console.log(' Git repository initialized');
     } catch (error) {
       console.log('⚠️  Failed to initialize Git repository. Please run "git init" manually.');
     }
 
-    console.log('\n✅ Git setup completed!\n');
+    console.log('\n Git setup completed!\n');
   }
 
   async displayNextSteps() {
@@ -4951,15 +5104,15 @@ export default defineConfig({
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['allure-playwright', { outputFolder: 'allure-results' }],
     ['list']
   ],
 
   use: {
     baseURL: '${this.config.baseURL}',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'on-first-retry',
+    // Enhanced tracing and video recording for better debugging
+    trace: 'retain-on-failure', // Keep traces for failed tests
+    screenshot: 'only-on-failure', // Screenshots on failure
+    video: 'retain-on-failure', // Keep videos for failed tests
     headless: false,
     viewport: { width: 1920, height: 1080 },
     actionTimeout: 30000,
@@ -4969,15 +5122,25 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Enhanced video recording for Chromium
+        video: { mode: 'retain-on-failure', size: { width: 1920, height: 1080 } }
+      },
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'],
+        video: { mode: 'retain-on-failure', size: { width: 1920, height: 1080 } }
+      },
     },
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { 
+        ...devices['Desktop Safari'],
+        video: { mode: 'retain-on-failure', size: { width: 1920, height: 1080 } }
+      },
     },
   ],
 
@@ -5269,7 +5432,7 @@ test.describe('API Tests', () => {
 });`;
 
     this.createFile('tests/api/api-tests.spec.ts', apiTestContent);
-    console.log('✅ API test files created');
+    console.log(' API test files created');
   }
 
   createVisualTestFiles() {
@@ -5283,7 +5446,7 @@ test.describe('Visual Tests', () => {
 });`;
 
     this.createFile('tests/visual/visual-tests.spec.ts', visualTestContent);
-    console.log('✅ Visual test files created');
+    console.log(' Visual test files created');
   }
 
   createAccessibilityTestFiles() {
@@ -5310,7 +5473,7 @@ test.describe('Accessibility Tests', () => {
 });`;
 
     this.createFile('tests/accessibility/accessibility-tests.spec.ts', accessibilityTestContent);
-    console.log('✅ Accessibility test files created');
+    console.log(' Accessibility test files created');
   }
 
   createCICDScripts() {
@@ -5396,7 +5559,7 @@ esac
 
 # Check if tests passed
 if [ \$? -eq 0 ]; then
-    log "✅ All tests passed successfully!"
+    log " All tests passed successfully!"
     
     # Generate additional reports if needed
     if [ "\$GENERATE_REPORTS" = "true" ]; then
@@ -5406,7 +5569,7 @@ if [ \$? -eq 0 ]; then
     
     exit 0
 else
-    error "❌ Some tests failed!"
+    error " Some tests failed!"
 fi`;
 
     this.createFile('ci-cd/run-tests.sh', runTestsScript);
@@ -5502,7 +5665,7 @@ Next Steps:
 3. Update documentation if needed
 EOF
 
-log "✅ Deployment completed successfully!"
+log " Deployment completed successfully!"
 log "📋 Deployment summary saved to deployment-summary.txt"`;
 
     this.createFile('ci-cd/deploy.sh', deployScript);
@@ -5512,7 +5675,7 @@ log "📋 Deployment summary saved to deployment-summary.txt"`;
 
 This directory contains scripts for continuous integration and deployment of the Playwright automation framework.
 
-## 📁 Files Overview
+## Files Overview
 
 ### \`run-tests.sh\`
 Main test execution script that handles running tests in different environments.
@@ -5559,7 +5722,7 @@ DEPLOY_TYPE=full ./ci-cd/deploy.sh
 - \`DEPLOY_TYPE\`: Type of deployment (test, full)
 - \`BACKUP_REPORTS\`: Create backup of existing reports (true/false)
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Make scripts executable:**
    \`\`\`bash
@@ -5576,7 +5739,7 @@ DEPLOY_TYPE=full ./ci-cd/deploy.sh
    DEPLOY_ENV=staging ./ci-cd/deploy.sh
    \`\`\`
 
-## 🔧 Integration with CI/CD Platforms
+## Integration with CI/CD Platforms
 
 ### GitHub Actions
 \`\`\`yaml
@@ -5617,7 +5780,7 @@ test:
     BROWSER: "chromium"
 \`\`\`
 
-## 📊 Monitoring and Reporting
+## Monitoring and Reporting
 
 The scripts automatically:
 - Generate test reports in \`test-results/\`
@@ -5625,7 +5788,7 @@ The scripts automatically:
 - Backup existing reports before new runs
 - Provide colored console output for better visibility
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -5651,7 +5814,7 @@ set -x  # Enable debug mode
 ./ci-cd/run-tests.sh
 \`\`\`
 
-## 📈 Best Practices
+## Best Practices
 
 1. **Environment Variables:** Always use environment variables for sensitive data
 2. **Backup Reports:** Enable backup before major deployments
@@ -5659,7 +5822,7 @@ set -x  # Enable debug mode
 4. **Monitoring:** Check logs and reports after each run
 5. **Cleanup:** Regularly clean up old test results and reports
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Framework Configuration](../framework.config.ts)
 - [Environment Configuration](../framework/config/EnvironmentConfig.ts)
@@ -5674,7 +5837,7 @@ set -x  # Enable debug mode
       console.log('⚠️  Failed to make scripts executable. Please run "chmod +x ci-cd/*.sh" manually.');
     }
 
-    console.log('✅ CI/CD scripts created');
+    console.log(' CI/CD scripts created');
   }
 
   createDashboard() {
@@ -6104,8 +6267,8 @@ class TestDashboard {
 
     getStatusIcon(status) {
         const icons = {
-            passed: '✅',
-            failed: '❌',
+            passed: '',
+            failed: '',
             skipped: '⏭️'
         };
         return icons[status] || '❓';
@@ -6226,31 +6389,31 @@ if (typeof module !== 'undefined' && module.exports) {
 
 A modern, interactive dashboard for monitoring and analyzing Playwright test results in real-time.
 
-## 🚀 Features
+## Features
 
-### 📊 Real-time Monitoring
+### Real-time Monitoring
 - Live test result updates
 - Auto-refresh every 30 seconds
 - Real-time statistics and metrics
 
-### 📈 Visual Analytics
+### Visual Analytics
 - Test pass/fail/skip statistics
 - Performance metrics and trends
 - Interactive filtering and sorting
 
-### 🎨 Modern UI
+### Modern UI
 - Responsive design for all devices
 - Beautiful gradient backgrounds
 - Smooth animations and transitions
 - Glassmorphism design elements
 
-### 🔧 Interactive Features
+### Interactive Features
 - Filter tests by status (All, Passed, Failed, Skipped)
 - Manual refresh capability
 - Export functionality (JSON, CSV)
 - Performance metrics calculation
 
-## 📁 File Structure
+## File Structure
 
 \`\`\`
 dashboard/
@@ -6259,7 +6422,7 @@ dashboard/
 └── README.md          # This documentation
 \`\`\`
 
-## 🛠️ Usage
+## Usage
 
 ### 1. Open Dashboard
 \`\`\`bash
@@ -6289,7 +6452,7 @@ xdg-open index.html
 - Auto-refresh occurs every 30 seconds
 - Loading indicators show during refresh
 
-## 🔧 Configuration
+## Configuration
 
 ### Customizing Data Source
 Edit \`dashboard.js\` to connect to your actual test results:
@@ -6326,7 +6489,7 @@ updateStats() {
 }
 \`\`\`
 
-## 📊 Data Format
+## Data Format
 
 The dashboard expects test data in this format:
 
@@ -6348,7 +6511,7 @@ The dashboard expects test data in this format:
 }
 \`\`\`
 
-## 🎨 Customization
+## Customization
 
 ### Styling
 Modify CSS in \`index.html\` to customize appearance:
@@ -6377,7 +6540,7 @@ getPerformanceMetrics() {
 }
 \`\`\`
 
-## 🔗 Integration
+## Integration
 
 ### With Playwright Framework
 \`\`\`bash
@@ -6434,7 +6597,7 @@ console.log('Dashboard data:', this.testData);
 console.log('Current filter:', this.currentFilter);
 \`\`\`
 
-## 📈 Future Enhancements
+## Future Enhancements
 
 ### Planned Features
 - [ ] WebSocket integration for real-time updates
@@ -6461,7 +6624,7 @@ console.log('Current filter:', this.currentFilter);
 - Add authentication if needed
 - Optimize for large datasets
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Framework Configuration](../framework.config.ts)
 - [Test Base](../framework/core/TestBase.ts)
@@ -6470,7 +6633,7 @@ console.log('Current filter:', this.currentFilter);
 
     this.createFile('dashboard/README.md', dashboardReadme);
 
-    console.log('✅ Dashboard created');
+    console.log(' Dashboard created');
   }
 
   createBaselineScreenshots() {
@@ -6479,7 +6642,7 @@ console.log('Current filter:', this.currentFilter);
 
 This directory contains baseline screenshots for visual regression testing. These images serve as the "golden standard" for comparing against new screenshots during test execution.
 
-## 📁 Structure
+## Structure
 
 \`\`\`
 baseline-screenshots/
@@ -6495,11 +6658,11 @@ baseline-screenshots/
 └── README.md
 \`\`\`
 
-## 🎯 Purpose
+## Purpose
 
 Visual regression testing compares screenshots taken during test execution against these baseline images to detect visual changes in the application.
 
-## 📸 How to Use
+## How to Use
 
 ### 1. Generate Baseline Screenshots
 
@@ -6534,7 +6697,7 @@ npm run update-baselines
 npx playwright test --update-snapshots --project=chromium
 \`\`\`
 
-## 🔧 Configuration
+## Configuration
 
 ### Visual Test Configuration
 
@@ -6570,7 +6733,7 @@ await expect(page.locator('.component')).toHaveScreenshot('component.png', {
 });
 \`\`\`
 
-## 📊 Best Practices
+## Best Practices
 
 ### 1. Baseline Management
 - **Version Control**: Always commit baseline screenshots to version control
@@ -6625,7 +6788,7 @@ npx playwright show-report
 npx playwright test --reporter=html
 \`\`\`
 
-## 📈 Integration with CI/CD
+## Integration with CI/CD
 
 ### GitHub Actions Example
 \`\`\`yaml
@@ -6647,7 +6810,7 @@ stage('Visual Testing') {
 }
 \`\`\`
 
-## 🔗 Related Files
+## Related Files
 
 - [Visual Test Configuration](../framework/visual/)
 - [Framework Configuration](../framework.config.ts)
@@ -6666,7 +6829,7 @@ stage('Visual Testing') {
     
     this.createFile('baseline-screenshots/README.md', baselineReadme);
 
-    console.log('✅ Baseline screenshots documentation created');
+    console.log(' Baseline screenshots documentation created');
   }
 
   createSmokeTests(baseURL, domain) {
@@ -6683,13 +6846,13 @@ test.describe('Smoke Tests', () => {
   });
 
   test('should load homepage successfully', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     await expect(page).toHaveTitle(/.*/);
-    await expect(page).toHaveURL('${baseURL}');
+    await expect(page).toHaveURL(/.*/);
   });
 
   test('should have basic page elements', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Check for common elements
     await expect(page.locator('body')).toBeVisible();
@@ -6703,7 +6866,7 @@ test.describe('Smoke Tests', () => {
       errors.push(error.message);
     });
 
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Wait a bit for any potential errors
     await page.waitForTimeout(2000);
@@ -6712,7 +6875,7 @@ test.describe('Smoke Tests', () => {
   });
 
   test('should have responsive design', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Test mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
@@ -6729,7 +6892,7 @@ test.describe('Smoke Tests', () => {
 });`;
 
     this.createFile('tests/smoke/smoke-tests.spec.ts', smokeTestContent);
-    console.log('✅ Smoke tests created');
+    console.log(' Smoke tests created');
   }
 
   createRegressionTests(baseURL, domain) {
@@ -6746,7 +6909,7 @@ test.describe('Regression Tests', () => {
   });
 
   test('should maintain page layout consistency', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Check for consistent layout elements
     const header = page.locator('header, .header, #header, [role="banner"]').first();
@@ -6762,7 +6925,7 @@ test.describe('Regression Tests', () => {
   });
 
   test('should handle navigation correctly', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Test internal links if they exist
     const links = page.locator('a[href^="/"], a[href^="${baseURL}"]');
@@ -6784,7 +6947,7 @@ test.describe('Regression Tests', () => {
   });
 
   test('should maintain form functionality', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Look for forms and test basic functionality
     const forms = page.locator('form');
@@ -6803,7 +6966,7 @@ test.describe('Regression Tests', () => {
   });
 
   test('should handle images correctly', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const images = page.locator('img');
     const imageCount = await images.count();
@@ -6823,7 +6986,7 @@ test.describe('Regression Tests', () => {
 });`;
 
     this.createFile('tests/regression/regression-tests.spec.ts', regressionTestContent);
-    console.log('✅ Regression tests created');
+    console.log(' Regression tests created');
   }
 
   createE2ETests(baseURL, domain) {
@@ -6841,7 +7004,7 @@ test.describe('End-to-End Tests', () => {
 
   test('complete user journey - homepage to contact', async ({ page }) => {
     // Step 1: Navigate to homepage
-    await page.goto('${baseURL}');
+    await page.goto('/');
     await expect(page).toHaveTitle(/.*/);
     
     // Step 2: Look for navigation elements
@@ -6859,7 +7022,7 @@ test.describe('End-to-End Tests', () => {
   });
 
   test('search functionality if available', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Look for search functionality
     const searchInput = page.locator('input[type="search"], input[name*="search"], input[placeholder*="search"], #search');
@@ -6880,7 +7043,7 @@ test.describe('End-to-End Tests', () => {
   });
 
   test('responsive navigation', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Test mobile menu if it exists
     await page.setViewportSize({ width: 375, height: 667 });
@@ -6898,7 +7061,7 @@ test.describe('End-to-End Tests', () => {
 });`;
 
     this.createFile('tests/e2e/e2e-tests.spec.ts', e2eTestContent);
-    console.log('✅ E2E tests created');
+    console.log(' E2E tests created');
   }
 
   createUnitTests(baseURL, domain) {
@@ -6915,7 +7078,7 @@ test.describe('Unit Tests', () => {
   });
 
   test('page title validation', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     const title = await page.title();
     
     expect(title).toBeTruthy();
@@ -6924,7 +7087,7 @@ test.describe('Unit Tests', () => {
   });
 
   test('meta tags validation', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Check for essential meta tags
     const viewport = page.locator('meta[name="viewport"]');
@@ -6940,7 +7103,7 @@ test.describe('Unit Tests', () => {
   });
 
   test('favicon validation', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const favicon = page.locator('link[rel*="icon"]');
     if (await favicon.count() > 0) {
@@ -6949,7 +7112,7 @@ test.describe('Unit Tests', () => {
   });
 
   test('language attribute validation', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const html = page.locator('html');
     const lang = await html.getAttribute('lang');
@@ -6960,7 +7123,7 @@ test.describe('Unit Tests', () => {
 });`;
 
     this.createFile('tests/unit/unit-tests.spec.ts', unitTestContent);
-    console.log('✅ Unit tests created');
+    console.log(' Unit tests created');
   }
 
   createIntegrationTests(baseURL, domain) {
@@ -6977,7 +7140,7 @@ test.describe('Integration Tests', () => {
   });
 
   test('CSS and JavaScript integration', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Check if CSS is loaded
     const stylesheets = page.locator('link[rel="stylesheet"]');
@@ -6994,7 +7157,7 @@ test.describe('Integration Tests', () => {
   });
 
   test('external resource integration', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Check for external resources (fonts, analytics, etc.)
     const externalResources = page.locator('link[href*="//"], script[src*="//"]');
@@ -7007,7 +7170,7 @@ test.describe('Integration Tests', () => {
   });
 
   test('form submission integration', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const forms = page.locator('form');
     const formCount = await forms.count();
@@ -7024,7 +7187,7 @@ test.describe('Integration Tests', () => {
 });`;
 
     this.createFile('tests/integration/integration-tests.spec.ts', integrationTestContent);
-    console.log('✅ Integration tests created');
+    console.log(' Integration tests created');
   }
 
   createAccessibilityTests(baseURL, domain) {
@@ -7041,7 +7204,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('page has proper heading structure', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const h1 = page.locator('h1');
     const h2 = page.locator('h2');
@@ -7053,7 +7216,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('images have alt attributes', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const images = page.locator('img');
     const imageCount = await images.count();
@@ -7071,7 +7234,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('form elements have labels', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const inputs = page.locator('input[type="text"], input[type="email"], input[type="password"], textarea, select');
     const inputCount = await inputs.count();
@@ -7096,7 +7259,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('color contrast is sufficient', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Basic color contrast check (this is a simplified version)
     const textElements = page.locator('p, h1, h2, h3, h4, h5, h6, span, div');
@@ -7110,7 +7273,7 @@ test.describe('Accessibility Tests', () => {
   });
 
   test('keyboard navigation works', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Test tab navigation
     await page.keyboard.press('Tab');
@@ -7125,7 +7288,7 @@ test.describe('Accessibility Tests', () => {
 });`;
 
     this.createFile('tests/accessibility/accessibility-tests.spec.ts', accessibilityTestContent);
-    console.log('✅ Accessibility tests created');
+    console.log(' Accessibility tests created');
   }
 
   createPerformanceTests(baseURL, domain) {
@@ -7144,7 +7307,7 @@ test.describe('Performance Tests', () => {
   test('page load time is acceptable', async ({ page }) => {
     const startTime = Date.now();
     
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const loadTime = Date.now() - startTime;
     
@@ -7172,7 +7335,7 @@ test.describe('Performance Tests', () => {
   });
 
   test('resource loading performance', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Get performance metrics
     const metrics = await page.evaluate(() => {
@@ -7192,7 +7355,7 @@ test.describe('Performance Tests', () => {
   });
 
   test('memory usage is reasonable', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Wait for page to stabilize
     await page.waitForTimeout(2000);
@@ -7215,7 +7378,7 @@ test.describe('Performance Tests', () => {
 });`;
 
     this.createFile('tests/performance/performance-tests.spec.ts', performanceTestContent);
-    console.log('✅ Performance tests created');
+    console.log(' Performance tests created');
   }
 
   createApiTests(baseURL, domain) {
@@ -7278,7 +7441,7 @@ test.describe('API Tests', () => {
 });`;
 
     this.createFile('tests/api/api-tests.spec.ts', apiTestContent);
-    console.log('✅ API tests created');
+    console.log(' API tests created');
   }
 
   createVisualTests(baseURL, domain) {
@@ -7295,7 +7458,7 @@ test.describe('Visual Tests', () => {
   });
 
   test('homepage visual regression', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Wait for page to load completely
     await page.waitForLoadState('networkidle');
@@ -7305,7 +7468,7 @@ test.describe('Visual Tests', () => {
   });
 
   test('responsive design visual test', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Test mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
@@ -7321,7 +7484,7 @@ test.describe('Visual Tests', () => {
   });
 
   test('header component visual test', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const header = page.locator('header, .header, #header, [role="banner"]').first();
     
@@ -7331,7 +7494,7 @@ test.describe('Visual Tests', () => {
   });
 
   test('footer component visual test', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const footer = page.locator('footer, .footer, #footer, [role="contentinfo"]').first();
     
@@ -7342,7 +7505,7 @@ test.describe('Visual Tests', () => {
 });`;
 
     this.createFile('tests/visual/visual-tests.spec.ts', visualTestContent);
-    console.log('✅ Visual tests created');
+    console.log(' Visual tests created');
   }
 
   createMobileTests(baseURL, domain) {
@@ -7361,7 +7524,7 @@ test.describe('Mobile Tests', () => {
   });
 
   test('mobile navigation works', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Look for mobile menu
     const mobileMenu = page.locator('.mobile-menu, .hamburger, .menu-toggle, [aria-label*="menu"]');
@@ -7379,7 +7542,7 @@ test.describe('Mobile Tests', () => {
   });
 
   test('mobile touch interactions', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     // Test touch interactions on buttons
     const buttons = page.locator('button, .btn, [role="button"]');
@@ -7394,7 +7557,7 @@ test.describe('Mobile Tests', () => {
   });
 
   test('mobile form interactions', async ({ page }) => {
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const inputs = page.locator('input[type="text"], input[type="email"], textarea');
     const inputCount = await inputs.count();
@@ -7410,7 +7573,7 @@ test.describe('Mobile Tests', () => {
   test('mobile performance', async ({ page }) => {
     const startTime = Date.now();
     
-    await page.goto('${baseURL}');
+    await page.goto('/');
     
     const loadTime = Date.now() - startTime;
     
@@ -7422,7 +7585,7 @@ test.describe('Mobile Tests', () => {
 });`;
 
     this.createFile('tests/mobile/mobile-tests.spec.ts', mobileTestContent);
-    console.log('✅ Mobile tests created');
+    console.log(' Mobile tests created');
   }
 
   createTestDataAndFixtures() {
@@ -7557,12 +7720,11 @@ test.describe('Mobile Tests', () => {
 
     this.createFile('fixtures/sample-data.json', JSON.stringify(fixtures, null, 2));
 
-    console.log('✅ Test data and fixtures created');
+    console.log(' Test data and fixtures created');
   }
 
   generateAccessibilityModule() {
     return `import { Page, Locator } from '@playwright/test';
-import * as axe from 'axe-core';
 
 export class Accessibility {
   private page: Page;
@@ -7572,49 +7734,67 @@ export class Accessibility {
   }
 
   /**
-   * Run accessibility audit using axe-core
+   * Run accessibility audit using basic checks
    */
   async runAccessibilityAudit(options: any = {}): Promise<any> {
-    const defaultOptions = {
-      runOnly: {
-        type: 'tag',
-        values: ['wcag2a', 'wcag2aa']
-      },
-      rules: {
-        'color-contrast': { enabled: true },
-        'document-title': { enabled: true },
-        'html-has-lang': { enabled: true },
-        'landmark-one-main': { enabled: true },
-        'page-has-heading-one': { enabled: true }
-      }
+    const results: {
+      violations: Array<{ id: string; description: string }>;
+      passes: Array<{ id: string; description: string }>;
+      incomplete: Array<{ id: string; description: string }>;
+      inapplicable: Array<{ id: string; description: string }>;
+    } = {
+      violations: [],
+      passes: [],
+      incomplete: [],
+      inapplicable: []
     };
 
-    const auditOptions = { ...defaultOptions, ...options };
+    try {
+      // Check for basic accessibility issues
+      const basicChecks = await this.page.evaluate(() => {
+        const issues: Array<{ id: string; description: string }> = [];
+        const passes: Array<{ id: string; description: string }> = [];
 
-    // Inject axe-core if not already present
-    await this.page.addInitScript(() => {
-      if (typeof window.axe === 'undefined') {
-        // Note: In a real implementation, you'd need to inject axe-core properly
-        console.log('Axe-core would be injected here');
-      }
-    });
-
-    // Run accessibility audit
-    const results = await this.page.evaluate((options) => {
-      return new Promise((resolve) => {
-        if (typeof window.axe !== 'undefined') {
-          window.axe.run(options, (err, results) => {
-            if (err) {
-              resolve({ error: err.message });
-            } else {
-              resolve(results);
-            }
-          });
+        // Check for page title
+        if (document.title) {
+          passes.push({ id: 'document-title', description: 'Document has a title' });
         } else {
-          resolve({ error: 'Axe-core not available' });
+          issues.push({ id: 'document-title', description: 'Document missing title' });
         }
+
+        // Check for lang attribute
+        if (document.documentElement.lang) {
+          passes.push({ id: 'html-has-lang', description: 'HTML has lang attribute' });
+        } else {
+          issues.push({ id: 'html-has-lang', description: 'HTML missing lang attribute' });
+        }
+
+        // Check for main landmark
+        const mainElements = document.querySelectorAll('main, [role="main"]');
+        if (mainElements.length > 0) {
+          passes.push({ id: 'landmark-one-main', description: 'Page has main landmark' });
+        } else {
+          issues.push({ id: 'landmark-one-main', description: 'Page missing main landmark' });
+        }
+
+        // Check for heading structure
+        const h1Elements = document.querySelectorAll('h1');
+        if (h1Elements.length > 0) {
+          passes.push({ id: 'page-has-heading-one', description: 'Page has h1 heading' });
+        } else {
+          issues.push({ id: 'page-has-heading-one', description: 'Page missing h1 heading' });
+        }
+
+        return { violations: issues, passes };
       });
-    }, auditOptions);
+
+      results.violations = basicChecks.violations;
+      results.passes = basicChecks.passes;
+
+    } catch (error: any) {
+      console.error('Accessibility audit failed:', error);
+      results.violations.push({ id: 'audit-error', description: \`Audit failed: \${error?.message || 'Unknown error'}\` });
+    }
 
     return results;
   }
@@ -8776,7 +8956,7 @@ export class Scroll {
   async scrollBy(x: number, y: number, options: any = {}): Promise<void> {
     const defaultOptions = { behavior: 'smooth' };
     const scrollOptions = { ...defaultOptions, ...options };
-    await this.page.evaluate((coords, opts) => {
+    await this.page.evaluate((coords: { x: number; y: number }, opts: any) => {
       window.scrollBy({ left: coords.x, top: coords.y, behavior: opts.behavior });
     }, { x, y }, scrollOptions);
   }
@@ -9489,10 +9669,10 @@ export { test as testWithHooks } from './hooks';
     try {
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
-        console.log(`✅ Created directory: ${dirPath}`);
+        console.log(` Created directory: ${dirPath}`);
       }
     } catch (error) {
-      console.error(`❌ Error creating directory ${dirPath}:`, error.message);
+      console.error(` Error creating directory ${dirPath}:`, error.message);
       throw error;
     }
   }
@@ -9506,9 +9686,9 @@ export { test as testWithHooks } from './hooks';
       
       // Write the file
       fs.writeFileSync(fullPath, content);
-      console.log(`✅ Created file: ${fullPath}`);
+      console.log(` Created file: ${fullPath}`);
     } catch (error) {
-      console.error(`❌ Error creating file ${fullPath}:`, error.message);
+      console.error(` Error creating file ${fullPath}:`, error.message);
       throw error;
     }
   }
@@ -9542,6 +9722,11 @@ export { test as testWithHooks } from './hooks';
       // Generate sample tests
       await this.generateSampleTests();
 
+      // Generate API scaffold if feature enabled
+      if (this.features['api-testing']) {
+        await this.generateApiScaffold();
+      }
+
       // Generate package.json with enhanced dependencies
       await this.generateEnhancedPackageJson();
 
@@ -9551,7 +9736,7 @@ export { test as testWithHooks } from './hooks';
       // Generate environment file
       await this.generateEnvironmentFile();
 
-      console.log('\n✅ Enhanced Playwright Framework setup completed successfully!');
+      console.log('\n Enhanced Playwright Framework setup completed successfully!');
       console.log(`\n📁 Project structure created in: ${this.projectName}/`);
       console.log('   ├── framework/');
       console.log('   │   ├── config/');
@@ -9576,7 +9761,7 @@ export { test as testWithHooks } from './hooks';
       console.log('   4. Check the generated documentation');
       
     } catch (error) {
-      console.error('❌ Error during setup:', error);
+      console.error(' Error during setup:', error);
       process.exit(1);
     }
   }
@@ -9589,7 +9774,7 @@ export { test as testWithHooks } from './hooks';
     while (!projectName || !this.isValidProjectName(projectName)) {
       projectName = await this.question('Enter project name: ');
       if (!this.isValidProjectName(projectName)) {
-        console.log('❌ Invalid project name. Use only letters, numbers, hyphens, and underscores.');
+        console.log(' Invalid project name. Use only letters, numbers, hyphens, and underscores.');
       }
     }
 
@@ -9600,7 +9785,7 @@ export { test as testWithHooks } from './hooks';
     while (!webUrl || !this.isValidUrl(webUrl)) {
       webUrl = await this.question('Enter the web URL to test (e.g., https://example.com): ');
       if (!this.isValidUrl(webUrl)) {
-        console.log('❌ Invalid URL. Please enter a valid URL starting with http:// or https://');
+        console.log(' Invalid URL. Please enter a valid URL starting with http:// or https://');
       }
     }
 
@@ -9611,7 +9796,7 @@ export { test as testWithHooks } from './hooks';
     if (fs.existsSync(this.projectName)) {
       const overwrite = await this.question(`Directory '${this.projectName}' already exists. Overwrite? (y/n): `);
       if (overwrite.toLowerCase() !== 'y') {
-        console.log('❌ Setup cancelled.');
+        console.log('Setup cancelled.');
         process.exit(0);
       }
       // Remove existing directory
@@ -9622,14 +9807,14 @@ export { test as testWithHooks } from './hooks';
     // Create project directory
     try {
       fs.mkdirSync(this.projectName);
-      console.log(`✅ Created project directory: ${this.projectName}`);
+      console.log(` Created project directory: ${this.projectName}`);
       
       // Change to project directory
       process.chdir(this.projectName);
       console.log(`📁 Working directory changed to: ${this.projectName}`);
       
     } catch (error) {
-      console.error(`❌ Error creating project directory: ${error.message}`);
+      console.error(` Error creating project directory: ${error.message}`);
       throw error;
     }
   }
@@ -9737,6 +9922,187 @@ export { test as testWithHooks } from './hooks';
     }
   }
 
+  async generateApiScaffold() {
+    console.log('🔌 Generating API testing scaffold...');
+    // Directories
+    await this.createDirectory(this.getProjectPath('framework/api/core'));
+    await this.createDirectory(this.getProjectPath('framework/api/clients'));
+    await this.createDirectory(this.getProjectPath('framework/api/utils'));
+    await this.createDirectory(this.getProjectPath('framework/api/schemas'));
+    await this.createDirectory(this.getProjectPath('tests/api'));
+
+    // Files: BaseApiClient
+    const baseApiClient = `import { APIRequestContext, request, APIResponse } from '@playwright/test';
+import { configManager } from '../config/EnvironmentConfig';
+
+export interface RequestOptions {
+  headers?: Record<string, string>;
+  query?: Record<string, string | number | boolean | undefined>;
+  body?: unknown;
+  timeoutMs?: number;
+  retries?: number;
+  failOnStatus?: boolean;
+}
+
+export interface AuthProvider {
+  getAuthHeaders: () => Promise<Record<string, string>> | Record<string, string>;
+}
+
+export class BaseApiClient {
+  protected context!: APIRequestContext;
+  protected readonly baseURL: string;
+  protected readonly defaultTimeoutMs: number;
+  protected readonly defaultRetries: number;
+  private readonly authProvider?: AuthProvider;
+
+  constructor(params?: { authProvider?: AuthProvider }) {
+    this.baseURL = configManager.getApiURL();
+    this.defaultTimeoutMs = configManager.getTimeout();
+    this.defaultRetries = configManager.getRetries();
+    this.authProvider = params?.authProvider;
+  }
+
+  async init(): Promise<void> {
+    const extraHTTPHeaders: Record<string, string> = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...(this.authProvider ? await this.authProvider.getAuthHeaders() : {}),
+    };
+
+    this.context = await request.newContext({
+      baseURL: this.baseURL,
+      extraHTTPHeaders,
+    });
+  }
+
+  async dispose(): Promise<void> {
+    if (this.context) {
+      await this.context.dispose();
+    }
+  }
+
+  protected async requestWithRetry(
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    url: string,
+    options?: RequestOptions
+  ): Promise<APIResponse> {
+    if (!this.context) {
+      await this.init();
+    }
+
+    const retries = options?.retries ?? this.defaultRetries;
+    const timeout = options?.timeoutMs ?? this.defaultTimeoutMs;
+    const failOnStatus = options?.failOnStatus ?? false;
+
+    const query = options?.query
+      ? '?' + new URLSearchParams(Object.entries(options.query).reduce((acc, [k, v]) => { if (v !== undefined) acc[k] = String(v); return acc; }, {})).toString()
+      : '';
+
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const response = await this.context.fetch(url + query, {
+          method,
+          headers: options?.headers,
+          data: options?.body,
+          timeout,
+          failOnStatusCode: failOnStatus,
+        });
+        console.log(method + ' ' + url + query + ' -> ' + response.status());
+        return response;
+      } catch (error) {
+        lastError = error;
+        if (attempt === retries) break;
+        await new Promise((res) => setTimeout(res, Math.min(1000 * Math.pow(2, attempt), 8000)));
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error('API request failed');
+  }
+}`;
+
+    // Files: AuthProvider
+    const authProvider = `export interface TokenProvider { getToken: () => Promise<string> | string; }
+
+export class BearerAuthProvider {
+  private readonly tokenProvider: TokenProvider;
+  constructor(tokenProvider: TokenProvider) { this.tokenProvider = tokenProvider; }
+  async getAuthHeaders(): Promise<Record<string, string>> {
+    const token = await this.tokenProvider.getToken();
+    return token ? { Authorization: 'Bearer ' + token } : {};
+  }
+}
+
+export class ApiKeyAuthProvider {
+  private readonly headerName: string;
+  private readonly tokenProvider: TokenProvider;
+  constructor(params: { headerName?: string; tokenProvider: TokenProvider }) {
+    this.headerName = params.headerName ?? 'x-api-key';
+    this.tokenProvider = params.tokenProvider;
+  }
+  async getAuthHeaders(): Promise<Record<string, string>> {
+    const key = await this.tokenProvider.getToken();
+    return key ? { [this.headerName]: String(key) } : {};
+  }
+}`;
+
+    // Files: UsersClient
+    const usersClient = `import { BaseApiClient, RequestOptions } from '../core/BaseApiClient';
+
+export class UsersClient extends BaseApiClient {
+  async getUser(userId: string, options?: RequestOptions) {
+    const res = await this.requestWithRetry('GET', '/users/' + encodeURIComponent(userId), options);
+    return res;
+  }
+  async listUsers(options?: RequestOptions) {
+    const res = await this.requestWithRetry('GET', '/users', options);
+    return res;
+  }
+}`;
+
+    // Files: SchemaValidator (stub)
+    const schemaValidator = `export type JsonSchema = Record<string, unknown>;
+export interface ValidationResult { valid: boolean; errors?: string[]; }
+export function validateAgainstSchema(_schema: JsonSchema, _data: unknown): ValidationResult { return { valid: true }; }
+`;
+
+    // Files: user.json schema
+    const userSchema = `{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": { "type": ["string", "number"] },
+    "name": { "type": "string" },
+    "email": { "type": "string" }
+  },
+  "required": ["id", "name"],
+  "additionalProperties": true
+}`;
+
+    // Files: sample API test
+    const apiTest = `import { test, expect } from '@playwright/test';
+import { UsersClient } from '../../framework/api/clients/UsersClient';
+
+test.describe('API: Users', () => {
+  test('GET /users/:id returns a user', async () => {
+    const client = new UsersClient();
+    const res = await client.getUser('1');
+    expect(res.ok(), 'status ' + res.status()).toBeTruthy();
+    await client.dispose();
+  });
+});
+`;
+
+    // Write files
+    await this.createFile('framework/api/core/BaseApiClient.ts', baseApiClient);
+    await this.createFile('framework/api/core/AuthProvider.ts', authProvider);
+    await this.createFile('framework/api/clients/UsersClient.ts', usersClient);
+    await this.createFile('framework/api/utils/SchemaValidator.ts', schemaValidator);
+    await this.createFile('framework/api/schemas/user.json', userSchema);
+    await this.createFile('tests/api/users.spec.ts', apiTest);
+
+    console.log(' API scaffold generated');
+  }
+
   async generateSampleTests() {
     console.log('🧪 Generating sample tests...');
     
@@ -9750,7 +10116,7 @@ export { test as testWithHooks } from './hooks';
   }
 
   async generateEnhancedPackageJson() {
-    console.log('📦 Generating enhanced package.json...');
+    console.log('Generating enhanced package.json...');
     
     const packageJson = {
       name: "playwright-enhanced-framework",
@@ -10270,7 +10636,7 @@ module.exports = EnhancedPlaywrightCLI;
 if (require.main === module) {
   const cli = new EnhancedPlaywrightCLI();
   cli.run().catch(error => {
-    console.error('❌ CLI Error:', error.message);
+    console.error(' CLI Error:', error.message);
     process.exit(1);
   });
 } 

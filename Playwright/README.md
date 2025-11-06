@@ -1,8 +1,8 @@
-# 🚀 Playwright Framework CLI
+# Playwright Framework CLI
 
 A comprehensive CLI tool to set up Playwright automation frameworks with accessibility testing, performance testing, and advanced features.
 
-## 📦 Installation
+## Installation
 
 ```bash
 # Install globally
@@ -12,7 +12,7 @@ npm install -g @utsuk-initiative1/playwright-framework-cli
 npm install @utsuk-initiative1/playwright-framework-cli
 ```
 
-## 🎯 Usage
+## Usage
 
 After installation, you can use any of these commands:
 
@@ -27,7 +27,7 @@ pw-framework
 utsuk-playwright
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install the CLI
@@ -39,46 +39,46 @@ playwright-framework
 # Follow the interactive prompts to set up your framework
 ```
 
-## ✨ Features
+## Features
 
-### 🎯 Interactive Project Setup
+### Interactive Project Setup
 - Guided project creation with multiple templates
 - Customizable framework configuration
 - Environment-specific settings
 
 
 
-### ♿ Accessibility Testing
+### Accessibility Testing
 - Built-in accessibility testing modules
 - WCAG compliance checking
 - Screen reader compatibility tests
 
-### 📊 Performance Testing
+### Performance Testing
 - Lighthouse integration
 - Performance benchmarking
 - Load testing capabilities
 
-### 📱 Mobile Testing
+### Mobile Testing
 - Mobile device simulation
 - Touch gesture testing
 - Responsive design validation
 
-### 🔍 Visual Regression Testing
+### Visual Regression Testing
 - Screenshot comparison
 - Baseline management
 - Visual diff reporting
 
-### 🧪 API Testing
+### API Testing
 - REST API testing
 - GraphQL support
 - API documentation generation
 
-### 📈 Comprehensive Reporting
+### Comprehensive Reporting
 - HTML reports
 - JSON output
 - Custom report formats
 
-## 🏗️ Framework Templates
+## Framework Templates
 
 ### 1. Basic Template
 - Essential Playwright setup
@@ -100,7 +100,7 @@ playwright-framework
 - Touch interactions
 - Device simulation
 
-## 🛠️ CLI Commands
+## CLI Commands
 
 ```bash
 # Create a new project
@@ -112,7 +112,7 @@ playwright-framework
 playwright-framework --help
 ```
 
-## 📁 Generated Project Structure
+## Generated Project Structure
 
 ```
 your-project/
@@ -162,7 +162,7 @@ your-project/
 └── package.json
 ```
 
-## 🔧 Configuration Options
+## Configuration Options
 
 ### Environment Configuration
 - Local, staging, and production environments
@@ -177,7 +177,7 @@ your-project/
 
 
 
-## 📊 Reporting Features
+## Reporting Features
 
 ### HTML Reports
 - Interactive test results
@@ -196,7 +196,7 @@ your-project/
 - Performance trends
 - Team collaboration
 
-## 🚀 CI/CD Integration
+## CI/CD Integration
 
 ### GitHub Actions
 - Automated testing
@@ -216,14 +216,14 @@ your-project/
 - Test result analysis
 - Deployment integration
 
-## 📚 Documentation
+## Documentation
 
 - [CLI README](./CLI_README.md) - Detailed CLI documentation
 - [Quick Start Guide](./QUICK_START.md) - Step-by-step setup
 - [Enhanced CLI README](./ENHANCED_CLI_README.md) - Advanced features
 - [Framework Documentation](./docs/README.md) - Framework usage
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -231,17 +231,17 @@ your-project/
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](../LICENSE) for details
 
-## 🆘 Support
+## Support
 
 - [GitHub Issues](https://github.com/utsuk-initiative1/playwright-generic-framework/issues)
 - [Documentation](./docs/README.md)
 - [Examples](./sample-tests/)
 
-## 🎉 Acknowledgments
+## Acknowledgments
 
 - Playwright team for the amazing testing framework
 
@@ -249,4 +249,4 @@ MIT License - see [LICENSE](../LICENSE) for details
 
 ---
 
-**Made with ❤️ by Utsuk Initiative**
+**Made with love by Utsuk Initiative**
