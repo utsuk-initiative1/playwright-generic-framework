@@ -115,6 +115,13 @@ class EnhancedPlaywrightCLI {
       await this.createMobileConfiguration();
     }
     
+    // Check if API automation is selected
+    if (this.automationType === 'api') {
+      // Enable API testing features automatically
+      this.features['api-testing'] = true;
+      console.log('\n✅ API Testing features enabled automatically');
+    }
+    
     await this.createProjectStructure();
     await this.installDependencies();
     await this.configureEnvironment();
@@ -135,11 +142,12 @@ class EnhancedPlaywrightCLI {
     
     // Ask for automation type first
     console.log('Select Automation Type:\n');
-    console.log('1. Web Automation (Browser-based testing)');
-    console.log('2. Mobile Automation (Native mobile apps)');
-    console.log('3. Hybrid (Both web and mobile)');
+    console.log('1. 🌐 Web Automation (Browser-based testing)');
+    console.log('2. 📱 Mobile Automation (Native mobile apps)');
+    console.log('3. 🔄 Hybrid (Both web and mobile)');
+    console.log('4. 🔌 API Automation (REST/GraphQL API testing)');
     
-    const automationType = await this.question('\nSelect automation type (1-3): ');
+    const automationType = await this.question('\nSelect automation type (1-4): ');
     
     switch (automationType) {
       case '1':
@@ -155,6 +163,11 @@ class EnhancedPlaywrightCLI {
         this.automationType = 'hybrid';
         console.log('Selected: Hybrid Automation (Web + Mobile)');
         await this.configureMobileApplication();
+        break;
+      case '4':
+        this.automationType = 'api';
+        console.log('Selected: API Automation');
+        await this.configureApiApplication();
         break;
       default:
         console.log('Invalid choice. Using Web Automation.');
@@ -424,6 +437,12 @@ class EnhancedPlaywrightCLI {
       console.log('2. Mobile-Standard (Full mobile testing suite)');
       console.log('3. Mobile-Enterprise (Advanced mobile + CI/CD) RECOMMENDED');
       console.log('4. Custom (Choose your features)');
+    } else if (this.automationType === 'api') {
+      console.log('🔌 API Automation Templates:');
+      console.log('1. API-Basic (Essential API testing features)');
+      console.log('2. API-Standard (Full API testing suite) RECOMMENDED');
+      console.log('3. API-Enterprise (Advanced API + CI/CD + Schema validation)');
+      console.log('4. Custom (Choose your features)');
     } else if (this.automationType === 'hybrid') {
       console.log('Hybrid Template Recommended!');
       console.log('1. Basic (Essential features only)');
@@ -442,25 +461,46 @@ class EnhancedPlaywrightCLI {
     
     const template = await this.question('\nSelect template (1-5): ');
     
-    switch (template) {
-      case '1':
-        this.features = this.getBasicTemplate();
-        break;
-      case '2':
-        this.features = this.getStandardTemplate();
-        break;
-      case '3':
-        this.features = this.getEnterpriseTemplate();
-        break;
-      case '4':
-        this.features = this.getMobileTemplate();
-        break;
-      case '5':
-        await this.selectCustomFeatures();
-        break;
-      default:
-        console.log('Invalid choice. Using Standard template.');
-        this.features = this.getStandardTemplate();
+    // Handle API-specific templates
+    if (this.automationType === 'api') {
+      switch (template) {
+        case '1':
+          this.features = this.getApiBasicTemplate();
+          break;
+        case '2':
+          this.features = this.getApiStandardTemplate();
+          break;
+        case '3':
+          this.features = this.getApiEnterpriseTemplate();
+          break;
+        case '4':
+          await this.selectCustomFeatures();
+          break;
+        default:
+          console.log('Invalid choice. Using API-Standard template.');
+          this.features = this.getApiStandardTemplate();
+      }
+    } else {
+      switch (template) {
+        case '1':
+          this.features = this.getBasicTemplate();
+          break;
+        case '2':
+          this.features = this.getStandardTemplate();
+          break;
+        case '3':
+          this.features = this.getEnterpriseTemplate();
+          break;
+        case '4':
+          this.features = this.getMobileTemplate();
+          break;
+        case '5':
+          await this.selectCustomFeatures();
+          break;
+        default:
+          console.log('Invalid choice. Using Standard template.');
+          this.features = this.getStandardTemplate();
+      }
     }
     
     console.log(`\nTemplate selected: ${this.getTemplateName(template)}\n`);
@@ -593,6 +633,83 @@ class EnhancedPlaywrightCLI {
     this.mobileConfig.platformVersion = await this.question('Enter platform version (default: 13.0): ') || '13.0';
     
     console.log('Mobile application configuration completed!');
+  }
+
+  async configureApiApplication() {
+    console.log('\n🔌 API Application Configuration\n');
+    
+    // Get API base URL
+    const apiURL = await this.question('Enter your API base URL (default: https://api.example.com): ') || 'https://api.example.com';
+    this.config.apiURL = apiURL;
+    console.log(`API Base URL: ${apiURL}`);
+    
+    // Ask about authentication
+    console.log('\nSelect Authentication Type:');
+    console.log('1. None (Public API)');
+    console.log('2. Bearer Token');
+    console.log('3. API Key');
+    console.log('4. Basic Auth');
+    console.log('5. OAuth 2.0');
+    
+    const authType = await this.question('\nSelect authentication type (1-5, default: 1): ') || '1';
+    
+    switch (authType) {
+      case '2':
+        this.apiConfig = { authType: 'bearer', token: await this.question('Enter Bearer token (or press Enter to configure later): ') || '' };
+        console.log('Selected: Bearer Token');
+        break;
+      case '3':
+        this.apiConfig = { 
+          authType: 'apikey', 
+          headerName: await this.question('Enter API key header name (default: x-api-key): ') || 'x-api-key',
+          apiKey: await this.question('Enter API key (or press Enter to configure later): ') || ''
+        };
+        console.log('Selected: API Key');
+        break;
+      case '4':
+        this.apiConfig = { 
+          authType: 'basic',
+          username: await this.question('Enter username (or press Enter to configure later): ') || '',
+          password: await this.question('Enter password (or press Enter to configure later): ') || ''
+        };
+        console.log('Selected: Basic Auth');
+        break;
+      case '5':
+        this.apiConfig = { 
+          authType: 'oauth2',
+          clientId: await this.question('Enter OAuth2 Client ID (or press Enter to configure later): ') || '',
+          clientSecret: await this.question('Enter OAuth2 Client Secret (or press Enter to configure later): ') || ''
+        };
+        console.log('Selected: OAuth 2.0');
+        break;
+      default:
+        this.apiConfig = { authType: 'none' };
+        console.log('Selected: No Authentication');
+    }
+    
+    // Ask about API type
+    console.log('\nSelect API Type:');
+    console.log('1. REST API');
+    console.log('2. GraphQL API');
+    console.log('3. Both (REST + GraphQL)');
+    
+    const apiType = await this.question('\nSelect API type (1-3, default: 1): ') || '1';
+    
+    switch (apiType) {
+      case '2':
+        this.apiConfig.apiType = 'graphql';
+        console.log('Selected: GraphQL API');
+        break;
+      case '3':
+        this.apiConfig.apiType = 'both';
+        console.log('Selected: REST + GraphQL');
+        break;
+      default:
+        this.apiConfig.apiType = 'rest';
+        console.log('Selected: REST API');
+    }
+    
+    console.log('\n✅ API application configuration completed!');
   }
 
   // Mobile-specific file generation methods
@@ -2496,6 +2613,63 @@ export default defineConfig({
       'reporting-dashboard': true,
       'test-generator': false,
       'interactions-module': true,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getApiBasicTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': false,
+      'performance-testing': false,
+      'accessibility-testing': false,
+      'mobile-testing': false,
+      'ci-cd-templates': false,
+      'docker-support': false,
+      'cloud-testing': false,
+      'reporting-dashboard': true,
+      'test-generator': false,
+      'interactions-module': false,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getApiStandardTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': false,
+      'performance-testing': true,
+      'accessibility-testing': false,
+      'mobile-testing': false,
+      'ci-cd-templates': true,
+      'docker-support': false,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': false,
+      'interactions-module': false,
+      'runner-configuration': true,
+      'utilities-module': true,
+      'constants-module': true
+    };
+  }
+
+  getApiEnterpriseTemplate() {
+    return {
+      'api-testing': true,
+      'visual-testing': false,
+      'performance-testing': true,
+      'accessibility-testing': false,
+      'mobile-testing': false,
+      'ci-cd-templates': true,
+      'docker-support': true,
+      'cloud-testing': true,
+      'reporting-dashboard': true,
+      'test-generator': true,
+      'interactions-module': false,
       'runner-configuration': true,
       'utilities-module': true,
       'constants-module': true
