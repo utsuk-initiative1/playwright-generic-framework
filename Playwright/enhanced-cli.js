@@ -126,6 +126,12 @@ class EnhancedPlaywrightCLI {
     await this.installDependencies();
     await this.configureEnvironment();
     await this.createComprehensiveFramework();
+    
+    // Generate API scaffold for API automation
+    if (this.automationType === 'api') {
+      await this.generateApiScaffold();
+    }
+    
     await this.createSampleTests();
     
     // Execute MCP test generation if enabled
@@ -248,6 +254,25 @@ class EnhancedPlaywrightCLI {
       const environments = await this.question('Enter environments to configure (comma-separated, default: local,staging,production): ') || 'local,staging,production';
       this.config.environments = environments.split(',').map(env => env.trim());
       
+    } else if (this.automationType === 'api') {
+      // API-only configuration - skip web base URL, use API URL from configureApiApplication()
+      console.log('\n🔌 API-Specific Configuration:\n');
+      
+      // API URL was already collected in configureApiApplication()
+      // Just validate it if needed
+      if (this.config.apiURL && !this.isValidUrl(this.config.apiURL)) {
+        console.log('Invalid API URL format. Please enter a valid URL.');
+        this.config.apiURL = await this.question('Enter valid API base URL: ');
+      }
+      
+      // Set baseURL to empty or same as API URL for API-only projects
+      this.config.baseURL = this.config.apiURL || 'https://api.example.com';
+      
+      const environments = await this.question('Enter API environments to configure (comma-separated, default: local,staging,production): ') || 'local,staging,production';
+      this.config.environments = environments.split(',').map(env => env.trim());
+      
+      console.log('✅ API configuration completed!');
+      
     } else {
       // Web-only configuration
       console.log('\nWeb-Specific Configuration:\n');
@@ -327,6 +352,50 @@ class EnhancedPlaywrightCLI {
           default:
             this.config.mcpType = 'ui-analysis';
             console.log('Default: UI Application Analysis');
+        }
+      } else if (this.automationType === 'api') {
+        console.log('🔌 API Test Generation Options:\n');
+        console.log('1. Analyze API documentation (OpenAPI/Swagger) and generate tests');
+        console.log('2. Generate comprehensive API test suite (REST + GraphQL)');
+        console.log('3. Generate API endpoint tests with authentication');
+        console.log('4. Generate API performance and load tests');
+        console.log('5. Generate API contract validation tests');
+        console.log('6. Custom API test generation (specify requirements)');
+        
+        const mcpOption = await this.question('\nSelect MCP option (1-6): ');
+        
+        switch (mcpOption) {
+          case '1':
+            this.config.mcpType = 'api-documentation';
+            const apiDocUrl = await this.question('Enter OpenAPI/Swagger URL (or press Enter to skip): ');
+            this.config.apiDocUrl = apiDocUrl || '';
+            console.log('Selected: API Documentation Analysis');
+            break;
+          case '2':
+            this.config.mcpType = 'api-comprehensive';
+            console.log('Selected: Comprehensive API Test Suite');
+            break;
+          case '3':
+            this.config.mcpType = 'api-auth';
+            console.log('Selected: API Authentication Tests');
+            break;
+          case '4':
+            this.config.mcpType = 'api-performance';
+            console.log('Selected: API Performance Tests');
+            break;
+          case '5':
+            this.config.mcpType = 'api-contract';
+            console.log('Selected: API Contract Validation Tests');
+            break;
+          case '6':
+            this.config.mcpType = 'api-custom';
+            const customRequirements = await this.question('Describe your API test requirements: ');
+            this.config.mcpCustomRequirements = customRequirements;
+            console.log('Selected: Custom API Test Generation');
+            break;
+          default:
+            this.config.mcpType = 'api-documentation';
+            console.log('Default: API Documentation Analysis');
         }
       } else if (this.automationType === 'mobile') {
         console.log('1. Analyze mobile app and generate native tests');
@@ -2866,6 +2935,24 @@ export default defineConfig({
         'test-results',
         'screenshots'
       ];
+    } else if (this.automationType === 'api') {
+      // API-only directories (no web framework)
+      directories = [
+        'framework/config',
+        'framework/api/core',
+        'framework/api/clients',
+        'framework/api/utils',
+        'framework/api/schemas',
+        'framework/utils',
+        'framework/constants',
+        'tests/api',
+        'reports',
+        'docs',
+        'fixtures',
+        'data',
+        'ci-cd',
+        'dashboard'
+      ];
     } else if (this.automationType === 'hybrid') {
       // Hybrid directories (both web and mobile)
       directories = [
@@ -2966,6 +3053,19 @@ export default defineConfig({
     if (this.automationType === 'mobile') {
       // Skip web framework creation for mobile automation
       console.log('Mobile automation selected - skipping web framework components');
+    } else if (this.automationType === 'api') {
+      // Skip web framework creation for API automation
+      console.log('API automation selected - skipping web framework components');
+      // Only create API-related utilities and constants
+      if (this.features['utilities-module']) {
+        this.createUtilitiesModule();
+      }
+      if (this.features['constants-module']) {
+        this.createConstantsModule();
+      }
+      if (this.features['runner-configuration']) {
+        this.createRunnerConfiguration();
+      }
     } else {
       // Create web framework components for web/hybrid automation
       if (this.features['interactions-module']) {
@@ -3982,7 +4082,52 @@ export default defineConfig({
     console.log('==================================\n');
     
     // Get the base URL from project configuration
-    const baseURL = this.config.baseURL || 'https://example.com';
+    const baseURL = this.config.baseURL || this.config.apiURL || 'https://example.com';
+    const mcpType = this.config.mcpType || 'ui-analysis';
+    
+    // Handle API automation differently (no browser needed)
+    if (this.automationType === 'api' || mcpType.startsWith('api-')) {
+      console.log(`🔌 Analyzing your API: ${this.config.apiURL || baseURL}`);
+      console.log('🔌 MCP Integration Status:');
+      console.log(`   - AI Provider: ${this.config.aiProvider || 'mock'}`);
+      console.log('   - MCP Server:  Running');
+      console.log('   - API Analyzer:  Ready\n');
+      
+      try {
+        // Perform API-specific analysis (no browser needed)
+        await this.performMCPAnalysis(null);
+        
+        // Generate API test scenarios
+        const testScenarios = await this.generateTestScenariosForMCPType();
+        
+        console.log('\n📝 Generated API Test Scenarios:');
+        console.log('============================');
+        testScenarios.forEach((scenario, index) => {
+          console.log(`\n${index + 1}. ${scenario.name}`);
+          console.log(`   Type: ${scenario.type}`);
+          console.log(`   Description: ${scenario.description}`);
+          console.log(`   Steps: ${scenario.steps.length} test steps`);
+        });
+        
+        // Save generated tests
+        console.log('\n💾 Saving Generated API Tests...');
+        await this.saveGeneratedTests(testScenarios);
+        
+        console.log('\n🎉 MCP API Test Generation Complete!');
+        console.log('================================');
+        console.log(' Generated comprehensive API test scenarios');
+        console.log(' Tests cover endpoints, authentication, performance, and contract validation');
+        console.log(' Ready to integrate into your API test suite');
+        
+      } catch (error) {
+        console.error(' MCP API Test Generation failed:', error.message);
+        console.log('\n💡 Note: This is a simulation. In production, MCP would');
+        console.log('   integrate with real AI services for enhanced API test generation.');
+      }
+      return;
+    }
+    
+    // Web/Mobile automation (browser-based)
     console.log(`🌐 Analyzing your application: ${baseURL}`);
     console.log('🔌 MCP Integration Status:');
     console.log(`   - AI Provider: ${this.config.aiProvider || 'mock'}`);
@@ -4111,6 +4256,55 @@ export default defineConfig({
         console.log('   🔄 iOS and Android compatibility checks...');
         await this.delay(2000);
         console.log('   📊 Platform-specific feature detection...');
+        await this.delay(2000);
+        break;
+        
+      case 'api-documentation':
+        console.log('   🔌 Analyzing API documentation (OpenAPI/Swagger)...');
+        await this.delay(2000);
+        console.log('   📊 Extracting API endpoints and schemas...');
+        await this.delay(2000);
+        console.log('   🔍 Identifying request/response patterns...');
+        await this.delay(2000);
+        console.log('   🎯 Generating test cases for each endpoint...');
+        await this.delay(2000);
+        break;
+        
+      case 'api-comprehensive':
+        console.log('   🔌 Comprehensive API analysis...');
+        await this.delay(2000);
+        console.log('   📊 REST and GraphQL endpoint discovery...');
+        await this.delay(2000);
+        console.log('   🔍 Authentication and authorization patterns...');
+        await this.delay(2000);
+        console.log('   ⚡ Performance and load testing scenarios...');
+        await this.delay(2000);
+        break;
+        
+      case 'api-auth':
+        console.log('   🔐 Analyzing API authentication mechanisms...');
+        await this.delay(2000);
+        console.log('   🔍 Testing Bearer tokens, API keys, OAuth flows...');
+        await this.delay(2000);
+        console.log('   📊 Generating authentication test scenarios...');
+        await this.delay(2000);
+        break;
+        
+      case 'api-performance':
+        console.log('   ⚡ Analyzing API performance characteristics...');
+        await this.delay(2000);
+        console.log('   📊 Response time patterns and bottlenecks...');
+        await this.delay(2000);
+        console.log('   🎯 Generating load and stress test scenarios...');
+        await this.delay(2000);
+        break;
+        
+      case 'api-contract':
+        console.log('   📋 Analyzing API contracts and schemas...');
+        await this.delay(2000);
+        console.log('   🔍 Validating request/response structures...');
+        await this.delay(2000);
+        console.log('   📊 Generating contract validation tests...');
         await this.delay(2000);
         break;
         
@@ -4289,6 +4483,211 @@ export default defineConfig({
               'Verify pinch-to-zoom',
               'Check touch interactions',
               'Test orientation changes'
+            ]
+          }
+        );
+        break;
+        
+      case 'api-documentation':
+        scenarios.push(
+          {
+            name: 'GET Endpoints Test Suite',
+            type: 'API Test',
+            description: 'Test all GET endpoints from API documentation',
+            steps: [
+              'Parse OpenAPI/Swagger documentation',
+              'Extract all GET endpoints',
+              'Test each endpoint with valid requests',
+              'Verify response status codes',
+              'Validate response schemas'
+            ]
+          },
+          {
+            name: 'POST Endpoints Test Suite',
+            type: 'API Test',
+            description: 'Test all POST endpoints with sample data',
+            steps: [
+              'Extract POST endpoints from documentation',
+              'Generate test data for each endpoint',
+              'Test successful creation scenarios',
+              'Test validation error scenarios',
+              'Verify response data structure'
+            ]
+          },
+          {
+            name: 'API Schema Validation Test',
+            type: 'API Test',
+            description: 'Validate request/response against OpenAPI schemas',
+            steps: [
+              'Load API schema definitions',
+              'Test request validation',
+              'Test response validation',
+              'Verify required fields',
+              'Check data types and formats'
+            ]
+          }
+        );
+        break;
+        
+      case 'api-comprehensive':
+        scenarios.push(
+          {
+            name: 'REST API Endpoint Coverage Test',
+            type: 'API Test',
+            description: 'Comprehensive REST API endpoint testing',
+            steps: [
+              'Test all CRUD operations',
+              'Verify HTTP methods (GET, POST, PUT, DELETE, PATCH)',
+              'Test query parameters and filters',
+              'Verify pagination and sorting',
+              'Test error responses'
+            ]
+          },
+          {
+            name: 'GraphQL Query Test',
+            type: 'API Test',
+            description: 'Test GraphQL queries and mutations',
+            steps: [
+              'Test GraphQL queries',
+              'Test GraphQL mutations',
+              'Verify nested data fetching',
+              'Test GraphQL error handling',
+              'Validate response structure'
+            ]
+          },
+          {
+            name: 'API Authentication Flow Test',
+            type: 'API Test',
+            description: 'Test complete authentication workflows',
+            steps: [
+              'Test login/authentication endpoints',
+              'Verify token generation and refresh',
+              'Test protected endpoint access',
+              'Test token expiration handling',
+              'Verify logout functionality'
+            ]
+          }
+        );
+        break;
+        
+      case 'api-auth':
+        scenarios.push(
+          {
+            name: 'Bearer Token Authentication Test',
+            type: 'API Test',
+            description: 'Test Bearer token authentication',
+            steps: [
+              'Obtain authentication token',
+              'Test protected endpoints with valid token',
+              'Test with expired token',
+              'Test with invalid token',
+              'Verify token refresh mechanism'
+            ]
+          },
+          {
+            name: 'API Key Authentication Test',
+            type: 'API Test',
+            description: 'Test API key authentication',
+            steps: [
+              'Test endpoints with valid API key',
+              'Test with missing API key',
+              'Test with invalid API key',
+              'Verify rate limiting with API key',
+              'Test API key rotation'
+            ]
+          },
+          {
+            name: 'OAuth 2.0 Flow Test',
+            type: 'API Test',
+            description: 'Test OAuth 2.0 authentication flow',
+            steps: [
+              'Test authorization code flow',
+              'Verify access token generation',
+              'Test refresh token mechanism',
+              'Test token revocation',
+              'Verify scope-based access control'
+            ]
+          }
+        );
+        break;
+        
+      case 'api-performance':
+        scenarios.push(
+          {
+            name: 'API Response Time Test',
+            type: 'API Performance Test',
+            description: 'Measure and validate API response times',
+            steps: [
+              'Measure endpoint response times',
+              'Test under normal load',
+              'Identify slow endpoints',
+              'Verify performance thresholds',
+              'Generate performance report'
+            ]
+          },
+          {
+            name: 'API Load Test',
+            type: 'API Performance Test',
+            description: 'Test API under various load conditions',
+            steps: [
+              'Test with concurrent requests',
+              'Measure throughput',
+              'Test rate limiting behavior',
+              'Verify system stability under load',
+              'Identify performance bottlenecks'
+            ]
+          },
+          {
+            name: 'API Stress Test',
+            type: 'API Performance Test',
+            description: 'Test API under extreme load conditions',
+            steps: [
+              'Gradually increase load',
+              'Test breaking points',
+              'Verify error handling under stress',
+              'Test recovery after load reduction',
+              'Document performance limits'
+            ]
+          }
+        );
+        break;
+        
+      case 'api-contract':
+        scenarios.push(
+          {
+            name: 'Request Contract Validation Test',
+            type: 'API Contract Test',
+            description: 'Validate request contracts',
+            steps: [
+              'Test required field validation',
+              'Test data type validation',
+              'Test format validation (email, date, etc.)',
+              'Test minimum/maximum value constraints',
+              'Verify error messages for invalid requests'
+            ]
+          },
+          {
+            name: 'Response Contract Validation Test',
+            type: 'API Contract Test',
+            description: 'Validate response contracts',
+            steps: [
+              'Verify response structure matches schema',
+              'Test required fields in responses',
+              'Validate data types in responses',
+              'Test optional vs required fields',
+              'Verify consistent response format'
+            ]
+          },
+          {
+            name: 'API Versioning Test',
+            type: 'API Contract Test',
+            description: 'Test API version compatibility',
+            steps: [
+              'Test different API versions',
+              'Verify backward compatibility',
+              'Test version-specific endpoints',
+              'Verify deprecation warnings',
+              'Test migration between versions'
             ]
           }
         );
@@ -4829,6 +5228,21 @@ test.describe('${scenario.name}', () => {
       // Create mobile-specific comprehensive content
       await this.createMobileComprehensiveContent();
 
+    } else if (this.automationType === 'api') {
+      // API-only framework files (no web UI components)
+      console.log('🔌 Creating API-only framework files...\n');
+      
+      // Create README.md for API
+      const readmeContent = this.generateApiReadme();
+      this.createFile('README.md', readmeContent);
+      console.log(' README.md created');
+
+      // Create sample API tests only
+      await this.createSampleTestFiles();
+
+      // API scaffold is already created in generateApiScaffold()
+      console.log('✅ API framework files already created');
+
     } else {
       // Web/Hybrid framework files
       console.log('🌐 Creating web/hybrid framework files...\n');
@@ -4874,6 +5288,21 @@ test.describe('${scenario.name}', () => {
       this.createUnitTests(baseURL, domain);
       this.createIntegrationTests(baseURL, domain);
       this.createMobileTests(baseURL, domain);
+      
+    } else if (this.automationType === 'api') {
+      // API-only tests (no web UI tests)
+      console.log('🔌 Creating API-specific tests...');
+      
+      const apiURL = this.config.apiURL || this.config.baseURL || 'https://api.example.com';
+      const domain = new URL(apiURL).hostname;
+      
+      // Only create API tests
+      if (this.features['api-testing']) {
+        this.createApiTests(apiURL, domain);
+      }
+      
+      // API tests are also created in generateApiScaffold(), so we just ensure they exist
+      console.log('✅ API test files created');
       
     } else if (this.automationType === 'hybrid') {
       // Hybrid tests (both web and mobile)
@@ -4980,21 +5409,39 @@ test.describe('${scenario.name}', () => {
     
     console.log('📋 Next Steps:\n');
     console.log(`1. Navigate to your project: cd ${this.projectName}`);
-    console.log('2. Update framework/config/EnvironmentConfig.ts with your application URLs');
-    console.log('3. Create your first page object in framework/pages/');
-    console.log('4. Write your first test in tests/');
-    console.log('5. Run tests: npm test');
+    
+    if (this.automationType === 'api') {
+      console.log('2. Update framework/config/EnvironmentConfig.ts with your API base URL');
+      console.log('3. Create your first API client in framework/api/clients/');
+      console.log('4. Write your first API test in tests/api/');
+      console.log('5. Run API tests: npm run test:api');
+    } else if (this.automationType === 'mobile') {
+      console.log('2. Update mobile/config/EnvironmentConfig.ts with your app details');
+      console.log('3. Create your first mobile page object in mobile/pages/');
+      console.log('4. Write your first test in mobile/tests/');
+      console.log('5. Run tests: npm test');
+    } else {
+      console.log('2. Update framework/config/EnvironmentConfig.ts with your application URLs');
+      console.log('3. Create your first page object in framework/pages/');
+      console.log('4. Write your first test in tests/');
+      console.log('5. Run tests: npm test');
+    }
     
     if (this.features['ci-cd-templates']) {
-      console.log('6. Configure CI/CD in .github/workflows/');
+      const stepNum = this.automationType === 'api' ? '6' : '6';
+      console.log(`${stepNum}. Configure CI/CD in .github/workflows/`);
     }
     
     if (this.features['docker-support']) {
-      console.log('7. Build Docker image: npm run docker:build');
+      const stepNum = this.features['ci-cd-templates'] ? '7' : '6';
+      console.log(`${stepNum}. Build Docker image: npm run docker:build`);
     }
     
     console.log('\n📚 Documentation:');
     console.log('- Framework README: README.md');
+    if (this.automationType === 'api') {
+      console.log('- API Framework README: framework/api/README.md');
+    }
     console.log('- Playwright docs: https://playwright.dev/');
     console.log('\n🚀 Happy testing!\n');
   }
@@ -5503,6 +5950,152 @@ Update \`framework/config/EnvironmentConfig.ts\` to configure your environments.
 2. Add proper TypeScript types
 3. Include meaningful test descriptions
 4. Use page object model pattern
+`;
+  }
+
+  generateApiReadme() {
+    const apiURL = this.config.apiURL || this.config.baseURL || 'https://api.example.com';
+    
+    return `# API Testing Framework
+
+A comprehensive API testing framework built with Playwright and TypeScript.
+
+## Features
+
+- REST API testing support
+- GraphQL API testing support
+- Multiple authentication methods (Bearer, API Key, Basic Auth)
+- Schema validation
+- Reusable API client methods
+- Comprehensive assertion utilities
+- Response time monitoring
+- Retry logic with exponential backoff
+
+## Quick Start
+
+1. Install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+2. Configure your API base URL in \`framework/config/EnvironmentConfig.ts\`:
+   \`\`\`typescript
+   API_URL: '${apiURL}'
+   \`\`\`
+
+3. Run API tests:
+   \`\`\`bash
+   npm run test:api
+   \`\`\`
+
+## Available Scripts
+
+- \`npm run test:api\` - Run all API tests
+- \`npm test\` - Run all tests
+- \`npm run test:ui\` - Run tests with Playwright UI
+- \`npm run report\` - Show test report
+
+## Project Structure
+
+\`\`\`
+${this.projectName}/
+├── framework/
+│   ├── api/
+│   │   ├── core/           # BaseApiClient, AuthProvider
+│   │   ├── clients/        # Domain-specific API clients
+│   │   ├── utils/           # ApiAssertions, ApiHelpers, SchemaValidator
+│   │   └── schemas/         # JSON schemas for validation
+│   ├── config/              # Configuration files
+│   ├── utils/               # Utility functions
+│   └── constants/          # Constants
+├── tests/
+│   └── api/                 # API test files
+├── data/                    # Test data files
+├── fixtures/                # Test fixtures
+└── reports/                 # Test reports
+\`\`\`
+
+## Usage Examples
+
+### Creating an API Client
+
+\`\`\`typescript
+import { BaseApiClient } from '../framework/api/core/BaseApiClient';
+import { BearerAuthProvider } from '../framework/api/core/AuthProvider';
+
+const authProvider = new BearerAuthProvider({
+  getToken: () => process.env.API_TOKEN || ''
+});
+
+const client = new BaseApiClient({ authProvider });
+await client.init();
+
+// Make requests
+const response = await client.get('/users/1');
+const data = await response.json();
+
+await client.dispose();
+\`\`\`
+
+### Using Reusable Methods
+
+\`\`\`typescript
+import { BaseApiClient } from '../framework/api/core/BaseApiClient';
+
+class ProductsClient extends BaseApiClient {
+  async getProduct(id: string) {
+    return this.get(\`/products/\${id}\`);
+  }
+
+  async createProduct(productData: Record<string, unknown>) {
+    return this.post('/products', productData);
+  }
+}
+\`\`\`
+
+### Using Assertions
+
+\`\`\`typescript
+import { ApiAssertions } from '../framework/api/utils/ApiAssertions';
+
+const response = await client.get('/users/1');
+await ApiAssertions.assertStatus(response, 200);
+await ApiAssertions.assertSuccess(response);
+
+const user = await ApiAssertions.assertJson(response);
+await ApiAssertions.assertFieldExists(user, 'id');
+\`\`\`
+
+## Authentication
+
+The framework supports multiple authentication methods:
+- **Bearer Token**: \`BearerAuthProvider\`
+- **API Key**: \`ApiKeyAuthProvider\`
+- **Basic Auth**: \`BasicAuthProvider\`
+
+See \`framework/api/README.md\` for detailed documentation.
+
+## Configuration
+
+Update \`framework/config/EnvironmentConfig.ts\` to configure:
+- API base URLs for different environments
+- Timeout settings
+- Retry configurations
+
+## Environment Variables
+
+- \`API_URL\` - API base URL
+- \`API_TOKEN\` - Bearer token for authentication
+- \`API_KEY\` - API key for authentication
+- \`TEST_ENV\` - Environment (local, staging, production)
+
+## Contributing
+
+1. Follow the existing code structure
+2. Add proper TypeScript types
+3. Include meaningful test descriptions
+4. Use the reusable API client methods
+5. Add schema validation where applicable
 `;
   }
 
@@ -9896,8 +10489,8 @@ export { test as testWithHooks } from './hooks';
       // Generate sample tests
       await this.generateSampleTests();
 
-      // Generate API scaffold if feature enabled
-      if (this.features['api-testing']) {
+      // Generate API scaffold if API automation or feature enabled
+      if (this.automationType === 'api' || this.features['api-testing']) {
         await this.generateApiScaffold();
       }
 
@@ -10169,7 +10762,12 @@ export class BaseApiClient {
     const failOnStatus = options?.failOnStatus ?? false;
 
     const query = options?.query
-      ? '?' + new URLSearchParams(Object.entries(options.query).reduce((acc, [k, v]) => { if (v !== undefined) acc[k] = String(v); return acc; }, {})).toString()
+      ? '?' + new URLSearchParams(
+          Object.entries(options.query).reduce<Record<string, string>>((acc, [k, v]) => {
+            if (v !== undefined) acc[k] = String(v);
+            return acc;
+          }, {})
+        ).toString()
       : '';
 
     let lastError: unknown;
@@ -10187,19 +10785,55 @@ export class BaseApiClient {
       } catch (error) {
         lastError = error;
         if (attempt === retries) break;
-        await new Promise((res) => setTimeout(res, Math.min(1000 * Math.pow(2, attempt), 8000)));
+        await this.exponentialBackoff(attempt);
       }
     }
     throw lastError instanceof Error ? lastError : new Error('API request failed');
   }
+
+  private async exponentialBackoff(attempt: number): Promise<void> {
+    const delayMs = Math.min(1000 * Math.pow(2, attempt), 8000);
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  // Reusable GET method
+  async get(url: string, options?: RequestOptions): Promise<APIResponse> {
+    return this.requestWithRetry('GET', url, options);
+  }
+
+  // Reusable POST method
+  async post(url: string, body?: unknown, options?: RequestOptions): Promise<APIResponse> {
+    return this.requestWithRetry('POST', url, { ...options, body });
+  }
+
+  // Reusable PUT method
+  async put(url: string, body?: unknown, options?: RequestOptions): Promise<APIResponse> {
+    return this.requestWithRetry('PUT', url, { ...options, body });
+  }
+
+  // Reusable PATCH method
+  async patch(url: string, body?: unknown, options?: RequestOptions): Promise<APIResponse> {
+    return this.requestWithRetry('PATCH', url, { ...options, body });
+  }
+
+  // Reusable DELETE method
+  async delete(url: string, options?: RequestOptions): Promise<APIResponse> {
+    return this.requestWithRetry('DELETE', url, options);
+  }
 }`;
 
     // Files: AuthProvider
-    const authProvider = `export interface TokenProvider { getToken: () => Promise<string> | string; }
+    const authProvider = `export interface TokenProvider {
+  getToken: () => Promise<string> | string;
+}
 
 export class BearerAuthProvider {
   private readonly tokenProvider: TokenProvider;
-  constructor(tokenProvider: TokenProvider) { this.tokenProvider = tokenProvider; }
+
+  constructor(tokenProvider: TokenProvider) {
+    this.tokenProvider = tokenProvider;
+  }
+
   async getAuthHeaders(): Promise<Record<string, string>> {
     const token = await this.tokenProvider.getToken();
     return token ? { Authorization: 'Bearer ' + token } : {};
@@ -10209,13 +10843,30 @@ export class BearerAuthProvider {
 export class ApiKeyAuthProvider {
   private readonly headerName: string;
   private readonly tokenProvider: TokenProvider;
+
   constructor(params: { headerName?: string; tokenProvider: TokenProvider }) {
     this.headerName = params.headerName ?? 'x-api-key';
     this.tokenProvider = params.tokenProvider;
   }
+
   async getAuthHeaders(): Promise<Record<string, string>> {
     const key = await this.tokenProvider.getToken();
     return key ? { [this.headerName]: String(key) } : {};
+  }
+}
+
+export class BasicAuthProvider {
+  private readonly username: string;
+  private readonly password: string;
+
+  constructor(username: string, password: string) {
+    this.username = username;
+    this.password = password;
+  }
+
+  async getAuthHeaders(): Promise<Record<string, string>> {
+    const credentials = Buffer.from(\`\${this.username}:\${this.password}\`).toString('base64');
+    return { Authorization: 'Basic ' + credentials };
   }
 }`;
 
@@ -10223,20 +10874,330 @@ export class ApiKeyAuthProvider {
     const usersClient = `import { BaseApiClient, RequestOptions } from '../core/BaseApiClient';
 
 export class UsersClient extends BaseApiClient {
+  /**
+   * Get user by ID
+   */
   async getUser(userId: string, options?: RequestOptions) {
-    const res = await this.requestWithRetry('GET', '/users/' + encodeURIComponent(userId), options);
-    return res;
+    return this.get('/users/' + encodeURIComponent(userId), options);
   }
+
+  /**
+   * List all users
+   */
   async listUsers(options?: RequestOptions) {
-    const res = await this.requestWithRetry('GET', '/users', options);
-    return res;
+    return this.get('/users', options);
+  }
+
+  /**
+   * Create a new user
+   */
+  async createUser(userData: Record<string, unknown>, options?: RequestOptions) {
+    return this.post('/users', userData, options);
+  }
+
+  /**
+   * Update user
+   */
+  async updateUser(userId: string, userData: Record<string, unknown>, options?: RequestOptions) {
+    return this.put('/users/' + encodeURIComponent(userId), userData, options);
+  }
+
+  /**
+   * Delete user
+   */
+  async deleteUser(userId: string, options?: RequestOptions) {
+    return this.delete('/users/' + encodeURIComponent(userId), options);
+  }
+
+  /**
+   * Search users with query parameters
+   */
+  async searchUsers(queryParams: { name?: string; email?: string; page?: number; limit?: number }, options?: RequestOptions) {
+    return this.get('/users', { ...options, query: queryParams });
   }
 }`;
 
-    // Files: SchemaValidator (stub)
-    const schemaValidator = `export type JsonSchema = Record<string, unknown>;
-export interface ValidationResult { valid: boolean; errors?: string[]; }
-export function validateAgainstSchema(_schema: JsonSchema, _data: unknown): ValidationResult { return { valid: true }; }
+    // Files: ApiAssertions
+    const apiAssertions = `import { APIResponse } from '@playwright/test';
+import { expect } from '@playwright/test';
+
+export class ApiAssertions {
+  /**
+   * Assert response status code
+   */
+  static async assertStatus(response: APIResponse, expectedStatus: number): Promise<void> {
+    expect(response.status(), \`Expected status \${expectedStatus}, got \${response.status()}\`).toBe(expectedStatus);
+  }
+
+  /**
+   * Assert response is successful (2xx)
+   */
+  static async assertSuccess(response: APIResponse): Promise<void> {
+    expect(response.ok(), \`Expected successful response (2xx), got \${response.status()}\`).toBeTruthy();
+  }
+
+  /**
+   * Assert response contains JSON
+   */
+  static async assertJson(response: APIResponse): Promise<unknown> {
+    const contentType = response.headers()['content-type'] || '';
+    expect(contentType, 'Response should be JSON').toContain('application/json');
+    return await response.json();
+  }
+
+  /**
+   * Assert response contains specific field
+   */
+  static async assertFieldExists(data: unknown, fieldPath: string): Promise<void> {
+    const fields = fieldPath.split('.');
+    let current: any = data;
+    
+    for (const field of fields) {
+      expect(current, \`Field '\${fieldPath}' not found\`).toBeDefined();
+      current = current[field];
+    }
+  }
+
+  /**
+   * Assert response field value
+   */
+  static async assertFieldValue(data: unknown, fieldPath: string, expectedValue: unknown): Promise<void> {
+    const fields = fieldPath.split('.');
+    let current: any = data;
+    
+    for (const field of fields) {
+      current = current[field];
+    }
+    
+    expect(current, \`Field '\${fieldPath}' value mismatch\`).toBe(expectedValue);
+  }
+
+  /**
+   * Assert response time is within threshold
+   */
+  static async assertResponseTime(response: APIResponse, maxTimeMs: number): Promise<void> {
+    const timing = await response.timing();
+    const responseTime = timing.responseEnd - timing.startTime;
+    expect(responseTime, \`Response time \${responseTime}ms exceeds threshold \${maxTimeMs}ms\`).toBeLessThan(maxTimeMs);
+  }
+
+  /**
+   * Assert response contains array
+   */
+  static async assertArray(data: unknown, minLength?: number): Promise<unknown[]> {
+    expect(Array.isArray(data), 'Response should be an array').toBeTruthy();
+    const array = data as unknown[];
+    if (minLength !== undefined) {
+      expect(array.length, \`Array should have at least \${minLength} items\`).toBeGreaterThanOrEqual(minLength);
+    }
+    return array;
+  }
+
+  /**
+   * Assert response contains object
+   */
+  static async assertObject(data: unknown): Promise<Record<string, unknown>> {
+    expect(typeof data === 'object' && data !== null && !Array.isArray(data), 'Response should be an object').toBeTruthy();
+    return data as Record<string, unknown>;
+  }
+
+  /**
+   * Assert error response
+   */
+  static async assertError(response: APIResponse, expectedStatus?: number): Promise<void> {
+    expect(response.ok(), 'Expected error response').toBeFalsy();
+    if (expectedStatus) {
+      await this.assertStatus(response, expectedStatus);
+    }
+  }
+}`;
+
+    // Files: ApiHelpers
+    const apiHelpers = `import { APIResponse } from '@playwright/test';
+
+export class ApiHelpers {
+  /**
+   * Extract response data as JSON
+   */
+  static async getJson<T = unknown>(response: APIResponse): Promise<T> {
+    return await response.json() as T;
+  }
+
+  /**
+   * Extract response data as text
+   */
+  static async getText(response: APIResponse): Promise<string> {
+    return await response.text();
+  }
+
+  /**
+   * Get response headers
+   */
+  static getHeaders(response: APIResponse): Record<string, string> {
+    return response.headers();
+  }
+
+  /**
+   * Get specific header value
+   */
+  static getHeader(response: APIResponse, headerName: string): string | undefined {
+    return response.headers()[headerName.toLowerCase()];
+  }
+
+  /**
+   * Calculate response time
+   */
+  static async getResponseTime(response: APIResponse): Promise<number> {
+    const timing = await response.timing();
+    return timing.responseEnd - timing.startTime;
+  }
+
+  /**
+   * Check if response is successful
+   */
+  static isSuccess(response: APIResponse): boolean {
+    return response.ok();
+  }
+
+  /**
+   * Get response status code
+   */
+  static getStatus(response: APIResponse): number {
+    return response.status();
+  }
+
+  /**
+   * Build query string from object
+   */
+  static buildQueryString(params: Record<string, string | number | boolean | undefined>): string {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        queryParams.append(key, String(value));
+      }
+    });
+    return queryParams.toString();
+  }
+
+  /**
+   * Parse pagination from response
+   */
+  static parsePagination(data: unknown): { page?: number; limit?: number; total?: number } {
+    const obj = data as Record<string, unknown>;
+    return {
+      page: obj.page as number | undefined,
+      limit: obj.limit as number | undefined,
+      total: obj.total as number | undefined,
+    };
+  }
+
+  /**
+   * Wait for async operation (polling)
+   */
+  static async waitForCondition(
+    condition: () => Promise<boolean>,
+    timeout: number = 30000,
+    interval: number = 1000
+  ): Promise<void> {
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeout) {
+      if (await condition()) {
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+    throw new Error('Condition not met within timeout');
+  }
+}`;
+
+    // Files: SchemaValidator
+    const schemaValidator = `// Lightweight schema validation utility
+// Can be extended with Ajv for full JSON Schema validation
+
+export type JsonSchema = Record<string, unknown>;
+
+export interface ValidationResult {
+  valid: boolean;
+  errors?: string[];
+}
+
+export class SchemaValidator {
+  /**
+   * Validate data against schema
+   * Note: This is a basic implementation. For full JSON Schema validation, integrate Ajv
+   */
+  static validateAgainstSchema(schema: JsonSchema, data: unknown): ValidationResult {
+    const errors: string[] = [];
+
+    try {
+      // Basic type checking
+      if (schema.type) {
+        const expectedType = schema.type as string;
+        const actualType = Array.isArray(data) ? 'array' : typeof data;
+        
+        if (expectedType === 'array' && !Array.isArray(data)) {
+          errors.push(\`Expected array, got \${actualType}\`);
+        } else if (expectedType === 'object' && (typeof data !== 'object' || data === null || Array.isArray(data))) {
+          errors.push(\`Expected object, got \${actualType}\`);
+        } else if (expectedType !== 'array' && expectedType !== 'object' && typeof data !== expectedType) {
+          errors.push(\`Expected \${expectedType}, got \${actualType}\`);
+        }
+      }
+
+      // Check required fields
+      if (schema.required && Array.isArray(schema.required) && typeof data === 'object' && data !== null) {
+        const dataObj = data as Record<string, unknown>;
+        const required = schema.required as string[];
+        required.forEach((field) => {
+          if (!(field in dataObj)) {
+            errors.push(\`Required field '\${field}' is missing\`);
+          }
+        });
+      }
+
+      // Check properties
+      if (schema.properties && typeof data === 'object' && data !== null) {
+        const dataObj = data as Record<string, unknown>;
+        const properties = schema.properties as Record<string, JsonSchema>;
+        
+        Object.keys(dataObj).forEach((key) => {
+          if (properties[key]) {
+            const propSchema = properties[key];
+            if (propSchema.type) {
+              const expectedType = propSchema.type as string;
+              const actualType = Array.isArray(dataObj[key]) ? 'array' : typeof dataObj[key];
+              
+              if (expectedType === 'array' && !Array.isArray(dataObj[key])) {
+                errors.push(\`Property '\${key}' should be array, got \${actualType}\`);
+              } else if (expectedType === 'object' && (typeof dataObj[key] !== 'object' || dataObj[key] === null || Array.isArray(dataObj[key]))) {
+                errors.push(\`Property '\${key}' should be object, got \${actualType}\`);
+              } else if (expectedType !== 'array' && expectedType !== 'object' && typeof dataObj[key] !== expectedType) {
+                errors.push(\`Property '\${key}' should be \${expectedType}, got \${actualType}\`);
+              }
+            }
+          }
+        });
+      }
+
+      return {
+        valid: errors.length === 0,
+        errors: errors.length > 0 ? errors : undefined,
+      };
+    } catch (error) {
+      return {
+        valid: false,
+        errors: [\`Validation error: \${error instanceof Error ? error.message : String(error)}\`],
+      };
+    }
+  }
+
+  /**
+   * Validate response against schema
+   */
+  static async validateResponse(response: unknown, schema: JsonSchema): Promise<ValidationResult> {
+    return this.validateAgainstSchema(schema, response);
+  }
+}
 `;
 
     // Files: user.json schema
@@ -10252,16 +11213,574 @@ export function validateAgainstSchema(_schema: JsonSchema, _data: unknown): Vali
   "additionalProperties": true
 }`;
 
-    // Files: sample API test
+    // Files: DualApiClient (for PHP vs Node.js comparison)
+    const dualApiClient = `import { APIRequestContext, request, APIResponse } from '@playwright/test';
+import { RequestOptions, AuthProvider } from './BaseApiClient';
+
+export interface DualApiConfig {
+  phpBaseURL: string;
+  nodeBaseURL: string;
+  phpAuthProvider?: AuthProvider;
+  nodeAuthProvider?: AuthProvider;
+  defaultTimeoutMs?: number;
+  defaultRetries?: number;
+}
+
+/**
+ * Client for making parallel requests to both PHP and Node.js APIs
+ * for comparison testing during migration
+ */
+export class DualApiClient {
+  private phpContext!: APIRequestContext;
+  private nodeContext!: APIRequestContext;
+  private readonly phpBaseURL: string;
+  private readonly nodeBaseURL: string;
+  private readonly defaultTimeoutMs: number;
+  private readonly defaultRetries: number;
+  private readonly phpAuthProvider?: AuthProvider;
+  private readonly nodeAuthProvider?: AuthProvider;
+
+  constructor(config: DualApiConfig) {
+    this.phpBaseURL = config.phpBaseURL;
+    this.nodeBaseURL = config.nodeBaseURL;
+    this.defaultTimeoutMs = config.defaultTimeoutMs ?? 30000;
+    this.defaultRetries = config.defaultRetries ?? 3;
+    this.phpAuthProvider = config.phpAuthProvider;
+    this.nodeAuthProvider = config.nodeAuthProvider;
+  }
+
+  async init(): Promise<void> {
+    const phpHeaders: Record<string, string> = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...(this.phpAuthProvider ? await this.phpAuthProvider.getAuthHeaders() : {}),
+    };
+
+    this.phpContext = await request.newContext({
+      baseURL: this.phpBaseURL,
+      extraHTTPHeaders: phpHeaders,
+    });
+
+    const nodeHeaders: Record<string, string> = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...(this.nodeAuthProvider ? await this.nodeAuthProvider.getAuthHeaders() : {}),
+    };
+
+    this.nodeContext = await request.newContext({
+      baseURL: this.nodeBaseURL,
+      extraHTTPHeaders: nodeHeaders,
+    });
+  }
+
+  async dispose(): Promise<void> {
+    if (this.phpContext) await this.phpContext.dispose();
+    if (this.nodeContext) await this.nodeContext.dispose();
+  }
+
+  async requestBoth(
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    url: string,
+    options?: RequestOptions
+  ): Promise<{ php: APIResponse; node: APIResponse }> {
+    if (!this.phpContext || !this.nodeContext) await this.init();
+
+    const query = options?.query
+      ? '?' + new URLSearchParams(
+          Object.entries(options.query).reduce<Record<string, string>>((acc, [k, v]) => {
+            if (v !== undefined) acc[k] = String(v);
+            return acc;
+          }, {})
+        ).toString()
+      : '';
+
+    const [phpResponse, nodeResponse] = await Promise.all([
+      this.makeRequest(this.phpContext, method, url + query, options),
+      this.makeRequest(this.nodeContext, method, url + query, options),
+    ]);
+
+    return { php: phpResponse, node: nodeResponse };
+  }
+
+  async getBoth(url: string, options?: RequestOptions) {
+    return this.requestBoth('GET', url, options);
+  }
+
+  async postBoth(url: string, body?: unknown, options?: RequestOptions) {
+    return this.requestBoth('POST', url, { ...options, body });
+  }
+
+  private async makeRequest(
+    context: APIRequestContext,
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    url: string,
+    options?: RequestOptions
+  ): Promise<APIResponse> {
+    const retries = options?.retries ?? this.defaultRetries;
+    const timeout = options?.timeoutMs ?? this.defaultTimeoutMs;
+    const failOnStatus = options?.failOnStatus ?? false;
+
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await context.fetch(url, {
+          method,
+          headers: options?.headers,
+          data: options?.body,
+          timeout,
+          failOnStatusCode: failOnStatus,
+        });
+      } catch (error) {
+        lastError = error;
+        if (attempt === retries) break;
+        await this.exponentialBackoff(attempt);
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error('API request failed');
+  }
+
+  private async exponentialBackoff(attempt: number): Promise<void> {
+    const delayMs = Math.min(1000 * Math.pow(2, attempt), 8000);
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+}
+`;
+
+    // Files: ApiComparisonUtils (simplified version for CLI)
+    const apiComparisonUtils = `import { APIResponse } from '@playwright/test';
+import { expect } from '@playwright/test';
+
+export interface ComparisonResult {
+  match: boolean;
+  differences: ComparisonDifference[];
+  summary: string;
+}
+
+export interface ComparisonDifference {
+  type: 'status' | 'header' | 'body' | 'structure' | 'field' | 'array_length' | 'field_value';
+  path: string;
+  expected: unknown;
+  actual: unknown;
+  message: string;
+}
+
+export interface ComparisonOptions {
+  ignoreHeaders?: string[];
+  ignoreFields?: string[];
+  tolerance?: number;
+  deepCompare?: boolean;
+  compareOrder?: boolean;
+  normalizeTimestamps?: boolean;
+  timestampFields?: string[];
+}
+
+export class ApiComparisonUtils {
+  static async compareResponses(
+    phpResponse: APIResponse,
+    nodeResponse: APIResponse,
+    options: ComparisonOptions = {}
+  ): Promise<ComparisonResult> {
+    const differences: ComparisonDifference[] = [];
+
+    if (phpResponse.status() !== nodeResponse.status()) {
+      differences.push({
+        type: 'status',
+        path: 'status',
+        expected: phpResponse.status(),
+        actual: nodeResponse.status(),
+        message: \`Status codes don't match: PHP=\${phpResponse.status()}, Node=\${nodeResponse.status()}\`
+      });
+    }
+
+    try {
+      const phpBody = await phpResponse.json();
+      const nodeBody = await nodeResponse.json();
+      const bodyDifferences = this.compareBodies(phpBody, nodeBody, '', options);
+      differences.push(...bodyDifferences);
+    } catch (error) {
+      const phpText = await phpResponse.text();
+      const nodeText = await nodeResponse.text();
+      if (phpText !== nodeText) {
+        differences.push({
+          type: 'body',
+          path: 'body',
+          expected: phpText.substring(0, 200) + '...',
+          actual: nodeText.substring(0, 200) + '...',
+          message: 'Response bodies do not match'
+        });
+      }
+    }
+
+    return {
+      match: differences.length === 0,
+      differences,
+      summary: differences.length === 0 
+        ? '✅ All comparisons passed'
+        : \`❌ Found \${differences.length} difference(s)\`
+    };
+  }
+
+  private static compareBodies(
+    phpBody: unknown,
+    nodeBody: unknown,
+    path: string,
+    options: ComparisonOptions
+  ): ComparisonDifference[] {
+    const differences: ComparisonDifference[] = [];
+    
+    if (phpBody === null || phpBody === undefined) {
+      if (nodeBody !== null && nodeBody !== undefined) {
+        differences.push({
+          type: 'field',
+          path: path || 'root',
+          expected: phpBody,
+          actual: nodeBody,
+          message: \`Field at '\${path || 'root'}' is null/undefined in PHP but has value in Node\`
+        });
+      }
+      return differences;
+    }
+
+    if (Array.isArray(phpBody)) {
+      if (!Array.isArray(nodeBody)) {
+        differences.push({
+          type: 'structure',
+          path: path || 'root',
+          expected: 'array',
+          actual: typeof nodeBody,
+          message: \`Expected array at '\${path || 'root'}'\`
+        });
+        return differences;
+      }
+      if (phpBody.length !== nodeBody.length) {
+        differences.push({
+          type: 'array_length',
+          path: path || 'root',
+          expected: phpBody.length,
+          actual: nodeBody.length,
+          message: \`Array length mismatch: PHP has \${phpBody.length}, Node has \${nodeBody.length}\`
+        });
+      }
+      return differences;
+    }
+
+    if (typeof phpBody === 'object' && phpBody !== null) {
+      if (typeof nodeBody !== 'object' || nodeBody === null || Array.isArray(nodeBody)) {
+        differences.push({
+          type: 'structure',
+          path: path || 'root',
+          expected: 'object',
+          actual: Array.isArray(nodeBody) ? 'array' : typeof nodeBody,
+          message: \`Expected object at '\${path || 'root'}'\`
+        });
+        return differences;
+      }
+
+      const phpObj = phpBody as Record<string, unknown>;
+      const nodeObj = nodeBody as Record<string, unknown>;
+      const allKeys = new Set([...Object.keys(phpObj), ...Object.keys(nodeObj)]);
+
+      for (const key of allKeys) {
+        if (options.ignoreFields?.includes(key)) continue;
+        const fieldPath = path ? \`\${path}.\${key}\` : key;
+        const fieldDifferences = this.compareBodies(phpObj[key], nodeObj[key], fieldPath, options);
+        differences.push(...fieldDifferences);
+      }
+      return differences;
+    }
+
+    if (phpBody !== nodeBody) {
+      differences.push({
+        type: 'field_value',
+        path: path || 'root',
+        expected: phpBody,
+        actual: nodeBody,
+        message: \`Value mismatch at '\${path || 'root'}': PHP="\${phpBody}", Node="\${nodeBody}"\`
+      });
+    }
+
+    return differences;
+  }
+
+  static async assertResponsesMatch(
+    phpResponse: APIResponse,
+    nodeResponse: APIResponse,
+    options: ComparisonOptions = {}
+  ): Promise<void> {
+    const result = await this.compareResponses(phpResponse, nodeResponse, options);
+    if (!result.match) {
+      console.error('\\n' + result.summary);
+      result.differences.forEach((diff, index) => {
+        console.error(\`\\n\${index + 1}. [\${diff.type}] \${diff.path}: \${diff.message}\`);
+      });
+      throw new Error(\`API responses do not match: \${result.summary}\`);
+    }
+  }
+}
+`;
+
+    // Files: index.ts (centralized exports)
+    const apiIndex = `// Centralized exports for API framework
+export * from './core/BaseApiClient';
+export * from './core/AuthProvider';
+export * from './core/DualApiClient';
+export * from './utils/ApiAssertions';
+export * from './utils/ApiHelpers';
+export * from './utils/ApiComparisonUtils';
+export * from './utils/SchemaValidator';
+`;
+
+    // Files: README.md
+    const apiReadme = `# API Testing Framework
+
+This directory contains reusable API testing utilities for the Playwright framework.
+
+## Structure
+
+\`\`\`
+framework/api/
+├── core/
+│   ├── BaseApiClient.ts    # Base client with HTTP methods (GET, POST, PUT, PATCH, DELETE)
+│   └── AuthProvider.ts     # Authentication providers (Bearer, API Key, Basic)
+├── clients/
+│   └── UsersClient.ts      # Example domain-specific API client
+├── utils/
+│   ├── ApiAssertions.ts   # Reusable assertion methods
+│   ├── ApiHelpers.ts      # Helper utilities for API responses
+│   └── SchemaValidator.ts # Schema validation utilities
+├── schemas/
+│   └── user.json          # Example JSON schema
+└── index.ts               # Centralized exports
+\`\`\`
+
+## Usage
+
+### Creating an API Client
+
+\`\`\`typescript
+import { BaseApiClient } from '../framework/api/core/BaseApiClient';
+import { BearerAuthProvider } from '../framework/api/core/AuthProvider';
+
+// With authentication
+const authProvider = new BearerAuthProvider({
+  getToken: () => process.env.API_TOKEN || ''
+});
+
+const client = new BaseApiClient({ authProvider });
+await client.init();
+
+// Make requests
+const response = await client.get('/users/1');
+const data = await response.json();
+
+await client.dispose();
+\`\`\`
+
+### Using Reusable Methods
+
+\`\`\`typescript
+import { BaseApiClient } from '../framework/api/core/BaseApiClient';
+
+class ProductsClient extends BaseApiClient {
+  async getProduct(id: string) {
+    return this.get(\`/products/\${id}\`);
+  }
+
+  async createProduct(productData: Record<string, unknown>) {
+    return this.post('/products', productData);
+  }
+}
+\`\`\`
+
+### Using Assertions
+
+\`\`\`typescript
+import { ApiAssertions } from '../framework/api/utils/ApiAssertions';
+import { ApiHelpers } from '../framework/api/utils/ApiHelpers';
+
+const response = await client.get('/users/1');
+
+// Assert status
+await ApiAssertions.assertStatus(response, 200);
+
+// Assert success
+await ApiAssertions.assertSuccess(response);
+
+// Get JSON data
+const data = await ApiAssertions.assertJson(response);
+
+// Assert field exists
+await ApiAssertions.assertFieldExists(data, 'id');
+await ApiAssertions.assertFieldValue(data, 'name', 'John Doe');
+
+// Assert response time
+await ApiAssertions.assertResponseTime(response, 1000);
+\`\`\`
+
+### Using Helpers
+
+\`\`\`typescript
+import { ApiHelpers } from '../framework/api/utils/ApiHelpers';
+
+const response = await client.get('/users');
+
+// Get JSON data
+const users = await ApiHelpers.getJson(response);
+
+// Get response time
+const responseTime = await ApiHelpers.getResponseTime(response);
+
+// Get headers
+const headers = ApiHelpers.getHeaders(response);
+const contentType = ApiHelpers.getHeader(response, 'content-type');
+
+// Build query string
+const query = ApiHelpers.buildQueryString({ page: 1, limit: 10 });
+\`\`\`
+
+## Authentication
+
+### Bearer Token
+\`\`\`typescript
+import { BearerAuthProvider } from '../framework/api/core/AuthProvider';
+
+const authProvider = new BearerAuthProvider({
+  getToken: () => process.env.API_TOKEN || ''
+});
+\`\`\`
+
+### API Key
+\`\`\`typescript
+import { ApiKeyAuthProvider } from '../framework/api/core/AuthProvider';
+
+const authProvider = new ApiKeyAuthProvider({
+  headerName: 'x-api-key', // optional, defaults to 'x-api-key'
+  tokenProvider: { getToken: () => process.env.API_KEY || '' }
+});
+\`\`\`
+
+### Basic Auth
+\`\`\`typescript
+import { BasicAuthProvider } from '../framework/api/core/AuthProvider';
+
+const authProvider = new BasicAuthProvider('username', 'password');
+\`\`\`
+
+## Examples
+
+See \`tests/api/\` directory for complete test examples.
+`;
+
+    // Files: sample API test (enhanced with reusable methods)
     const apiTest = `import { test, expect } from '@playwright/test';
 import { UsersClient } from '../../framework/api/clients/UsersClient';
+import { ApiAssertions } from '../../framework/api/utils/ApiAssertions';
+import { ApiHelpers } from '../../framework/api/utils/ApiHelpers';
 
 test.describe('API: Users', () => {
-  test('GET /users/:id returns a user', async () => {
-    const client = new UsersClient();
-    const res = await client.getUser('1');
-    expect(res.ok(), 'status ' + res.status()).toBeTruthy();
+  let client: UsersClient;
+
+  test.beforeEach(async () => {
+    client = new UsersClient();
+    await client.init();
+  });
+
+  test.afterEach(async () => {
     await client.dispose();
+  });
+
+  test('GET /users/:id returns a user', async () => {
+    const response = await client.getUser('1');
+    
+    // Use reusable assertions
+    await ApiAssertions.assertSuccess(response);
+    await ApiAssertions.assertStatus(response, 200);
+    
+    // Get and validate response data
+    const user = await ApiAssertions.assertJson(response);
+    await ApiAssertions.assertFieldExists(user, 'id');
+    await ApiAssertions.assertFieldExists(user, 'name');
+    
+    // Check response time
+    await ApiAssertions.assertResponseTime(response, 1000);
+  });
+
+  test('GET /users returns list of users', async () => {
+    const response = await client.listUsers();
+    
+    await ApiAssertions.assertSuccess(response);
+    
+    const users = await ApiHelpers.getJson(response);
+    await ApiAssertions.assertArray(users, 1); // At least 1 user
+    
+    // Verify user structure
+    if (Array.isArray(users) && users.length > 0) {
+      await ApiAssertions.assertFieldExists(users[0], 'id');
+    }
+  });
+
+  test('POST /users creates a new user', async () => {
+    const newUser = {
+      name: 'Test User',
+      email: 'test@example.com'
+    };
+    
+    const response = await client.createUser(newUser);
+    
+    await ApiAssertions.assertStatus(response, 201);
+    
+    const createdUser = await ApiHelpers.getJson(response);
+    await ApiAssertions.assertFieldValue(createdUser, 'name', 'Test User');
+  });
+
+  test('GET /users with query parameters', async () => {
+    const response = await client.searchUsers({
+      page: 1,
+      limit: 10
+    });
+    
+    await ApiAssertions.assertSuccess(response);
+    
+    const data = await ApiHelpers.getJson(response);
+    const pagination = ApiHelpers.parsePagination(data);
+    
+    // Verify pagination structure
+    if (pagination.page !== undefined) {
+      expect(pagination.page).toBeGreaterThanOrEqual(1);
+    }
+  });
+});
+`;
+
+    // Files: API Comparison Test Example
+    const apiComparisonTest = `import { test } from '@playwright/test';
+import { DualApiClient } from '../../framework/api/core/DualApiClient';
+import { ApiComparisonUtils } from '../../framework/api/utils/ApiComparisonUtils';
+
+test.describe('API Comparison: PHP vs Node.js', () => {
+  let dualClient: DualApiClient;
+
+  test.beforeAll(async () => {
+    dualClient = new DualApiClient({
+      phpBaseURL: process.env.PHP_API_BASE_URL || 'https://php-api.example.com',
+      nodeBaseURL: process.env.NODE_API_BASE_URL || 'https://node-api.example.com',
+      defaultTimeoutMs: 30000,
+      defaultRetries: 3,
+    });
+    await dualClient.init();
+  });
+
+  test.afterAll(async () => {
+    await dualClient.dispose();
+  });
+
+  test('Compare API responses', async () => {
+    const { php, node } = await dualClient.getBoth('/api/users/1');
+    
+    await ApiComparisonUtils.assertResponsesMatch(php, node, {
+      ignoreHeaders: ['date', 'x-request-id'],
+      normalizeTimestamps: true,
+    });
   });
 });
 `;
@@ -10269,12 +11788,19 @@ test.describe('API: Users', () => {
     // Write files
     await this.createFile('framework/api/core/BaseApiClient.ts', baseApiClient);
     await this.createFile('framework/api/core/AuthProvider.ts', authProvider);
+    await this.createFile('framework/api/core/DualApiClient.ts', dualApiClient);
     await this.createFile('framework/api/clients/UsersClient.ts', usersClient);
+    await this.createFile('framework/api/utils/ApiAssertions.ts', apiAssertions);
+    await this.createFile('framework/api/utils/ApiHelpers.ts', apiHelpers);
+    await this.createFile('framework/api/utils/ApiComparisonUtils.ts', apiComparisonUtils);
     await this.createFile('framework/api/utils/SchemaValidator.ts', schemaValidator);
     await this.createFile('framework/api/schemas/user.json', userSchema);
+    await this.createFile('framework/api/index.ts', apiIndex);
+    await this.createFile('framework/api/README.md', apiReadme);
     await this.createFile('tests/api/users.spec.ts', apiTest);
+    await this.createFile('tests/api/api-comparison.spec.ts', apiComparisonTest);
 
-    console.log(' API scaffold generated');
+    console.log('✅ API scaffold generated with reusable methods and comparison utilities');
   }
 
   async generateSampleTests() {
