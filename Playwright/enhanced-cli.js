@@ -11795,10 +11795,347 @@ test.describe('API Comparison: PHP vs Node.js', () => {
     await this.createFile('framework/api/utils/ApiComparisonUtils.ts', apiComparisonUtils);
     await this.createFile('framework/api/utils/SchemaValidator.ts', schemaValidator);
     await this.createFile('framework/api/schemas/user.json', userSchema);
+    // Files: API Comparison Testing Guide
+    const apiTestingGuide = `# 🧪 API Comparison Testing Guide
+
+## ✅ Verification: All Components Present
+
+Your generated framework includes all the API comparison components:
+
+### ✅ Core Components
+- ✅ \`framework/api/core/DualApiClient.ts\` - Dual API client for PHP/Node.js testing
+- ✅ \`framework/api/utils/ApiComparisonUtils.ts\` - Response comparison utilities
+- ✅ \`framework/api/index.ts\` - Exports both components
+
+### ✅ Test Files
+- ✅ \`tests/api/api-comparison.spec.ts\` - Comparison test example
+- ✅ \`tests/api/users.spec.ts\` - Standard API test example
+
+---
+
+## 🚀 Quick Start Testing
+
+### Step 1: Install Dependencies
+
+\`\`\`bash
+npm install
+\`\`\`
+
+### Step 2: Set Environment Variables
+
+Create a \`.env\` file or export variables:
+
+\`\`\`bash
+# PHP API endpoint
+export PHP_API_BASE_URL=https://your-php-api.com
+
+# Node.js API endpoint  
+export NODE_API_BASE_URL=https://your-node-api.com
+
+# Optional: Authentication tokens
+export PHP_API_TOKEN=your-php-token
+export NODE_API_TOKEN=your-node-token
+\`\`\`
+
+### Step 3: Run Comparison Tests
+
+\`\`\`bash
+# Run all API comparison tests
+npm run test:api
+
+# Run specific comparison test
+npx playwright test tests/api/api-comparison.spec.ts
+
+# Run with UI mode (recommended for first time)
+npx playwright test tests/api/api-comparison.spec.ts --ui
+\`\`\`
+
+---
+
+## 📝 Testing Your API Endpoints
+
+### Example: Basic Comparison Test
+
+\`\`\`typescript
+import { test } from '@playwright/test';
+import { DualApiClient } from '../../framework/api/core/DualApiClient';
+import { ApiComparisonUtils } from '../../framework/api/utils/ApiComparisonUtils';
+
+test.describe('API Comparison: PHP vs Node.js', () => {
+  let dualClient: DualApiClient;
+
+  test.beforeAll(async () => {
+    dualClient = new DualApiClient({
+      phpBaseURL: process.env.PHP_API_BASE_URL || 'https://php-api.example.com',
+      nodeBaseURL: process.env.NODE_API_BASE_URL || 'https://node-api.example.com',
+      defaultTimeoutMs: 30000,
+      defaultRetries: 3,
+    });
+    await dualClient.init();
+  });
+
+  test.afterAll(async () => {
+    await dualClient.dispose();
+  });
+
+  test('Compare API responses', async () => {
+    const { php, node } = await dualClient.getBoth('/api/users/1');
+    
+    await ApiComparisonUtils.assertResponsesMatch(php, node, {
+      ignoreHeaders: ['date', 'x-request-id'],
+      normalizeTimestamps: true,
+    });
+  });
+});
+\`\`\`
+
+---
+
+## 🧪 Test Scenarios
+
+### 1. Basic Comparison Test
+
+\`\`\`typescript
+test('Basic API Comparison', async () => {
+  const { php, node } = await dualClient.getBoth('/api/users/1');
+  
+  await ApiComparisonUtils.assertResponsesMatch(php, node, {
+    ignoreHeaders: ['date', 'x-request-id'],
+  });
+});
+\`\`\`
+
+### 2. POST Request Comparison
+
+\`\`\`typescript
+test('POST Request Comparison', async () => {
+  const requestBody = {
+    name: 'Test User',
+    email: 'test@example.com',
+  };
+
+  const { php, node } = await dualClient.postBoth('/api/users', requestBody);
+
+  await ApiComparisonUtils.assertResponsesMatch(php, node, {
+    ignoreHeaders: ['date', 'location'],
+    normalizeTimestamps: true,
+  });
+});
+\`\`\`
+
+### 3. With Query Parameters
+
+\`\`\`typescript
+test('GET with Query Parameters', async () => {
+  const { php, node } = await dualClient.getBoth('/api/users', {
+    query: {
+      page: 1,
+      limit: 10,
+      sort: 'name',
+    },
+  });
+
+  await ApiComparisonUtils.assertResponsesMatch(php, node);
+});
+\`\`\`
+
+---
+
+## 🔧 Configuration Options
+
+### ComparisonOptions
+
+\`\`\`typescript
+interface ComparisonOptions {
+  ignoreHeaders?: string[];        // Headers to ignore
+  ignoreFields?: string[];         // Fields to ignore in body
+  tolerance?: number;               // Numeric comparison tolerance
+  deepCompare?: boolean;            // Deep object comparison
+  compareOrder?: boolean;           // Compare array order
+  normalizeTimestamps?: boolean;    // Normalize timestamp fields
+  timestampFields?: string[];      // Fields that are timestamps
+}
+\`\`\`
+
+### Example Configuration
+
+\`\`\`typescript
+const options = {
+  ignoreHeaders: [
+    'date',
+    'x-request-id',
+    'x-response-time',
+    'server',
+  ],
+  ignoreFields: [
+    'requestId',
+    'serverTimestamp',
+  ],
+  normalizeTimestamps: true,
+  timestampFields: [
+    'created_at',
+    'updated_at',
+    'timestamp',
+  ],
+  tolerance: 0.01,
+  deepCompare: true,
+  compareOrder: false,
+};
+\`\`\`
+
+---
+
+## 📊 Understanding Test Results
+
+### Success Output
+
+\`\`\`
+✅ SUCCESS: PHP and Node.js responses match!
+
+================================================================================
+API COMPARISON REPORT
+================================================================================
+
+PHP Endpoint: https://php-api.example.com/api/users/1
+Node Endpoint: https://node-api.example.com/api/users/1
+Comparison Status: ✅ MATCH
+
+✅ All comparisons passed - PHP and Node.js responses match
+\`\`\`
+
+### Failure Output
+
+\`\`\`
+❌ MISMATCH: Found differences between PHP and Node.js responses
+
+Total differences: 3
+
+Differences by type:
+  - status: 1
+  - field_value: 2
+
+1. [STATUS] status: Status codes don't match: PHP=200, Node=404
+2. [FIELD_VALUE] name: Value mismatch: PHP="John", Node="Jane"
+3. [FIELD_VALUE] age: Numeric value mismatch: PHP=30, Node=31
+\`\`\`
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: Tests fail due to timestamp differences
+
+**Solution:**
+\`\`\`typescript
+normalizeTimestamps: true,
+timestampFields: ['created_at', 'updated_at']
+\`\`\`
+
+### Issue: Headers don't match
+
+**Solution:**
+\`\`\`typescript
+ignoreHeaders: ['date', 'x-request-id', 'server']
+\`\`\`
+
+### Issue: Arrays in different order
+
+**Solution:**
+\`\`\`typescript
+compareOrder: false
+\`\`\`
+
+### Issue: Numeric precision differences
+
+**Solution:**
+\`\`\`typescript
+tolerance: 0.01
+\`\`\`
+
+### Issue: Authentication errors
+
+**Solution:**
+\`\`\`typescript
+import { BearerAuthProvider } from '../../framework/api/core/AuthProvider';
+
+const dualClient = new DualApiClient({
+  phpBaseURL: 'https://php-api.com',
+  nodeBaseURL: 'https://node-api.com',
+  phpAuthProvider: new BearerAuthProvider({
+    getToken: () => process.env.PHP_API_TOKEN || ''
+  }),
+  nodeAuthProvider: new BearerAuthProvider({
+    getToken: () => process.env.NODE_API_TOKEN || ''
+  }),
+});
+\`\`\`
+
+---
+
+## 📋 Available Test Commands
+
+\`\`\`bash
+# Run all API tests
+npm run test:api
+
+# Run comparison tests only
+npx playwright test tests/api/api-comparison.spec.ts
+
+# Run with UI (recommended for debugging)
+npx playwright test tests/api/api-comparison.spec.ts --ui
+
+# Run in headed mode
+npx playwright test tests/api/api-comparison.spec.ts --headed
+
+# Run with debug mode
+npx playwright test tests/api/api-comparison.spec.ts --debug
+
+# Run specific test
+npx playwright test tests/api/api-comparison.spec.ts -g "Compare API responses"
+
+# Generate test report
+npm run report
+\`\`\`
+
+---
+
+## ✅ Checklist
+
+Before running tests, ensure:
+
+- [ ] Dependencies installed (\`npm install\`)
+- [ ] Environment variables set (PHP_API_BASE_URL, NODE_API_BASE_URL)
+- [ ] Both APIs are accessible
+- [ ] Authentication configured (if needed)
+- [ ] Test endpoints are correct
+- [ ] Comparison options configured appropriately
+
+---
+
+## 🎯 Next Steps
+
+1. **Update API endpoints** in environment variables
+2. **Create your specific test** for your API endpoints
+3. **Run the test** and review results
+4. **Adjust comparison options** based on differences
+5. **Integrate into CI/CD** for continuous comparison
+
+---
+
+## 📞 Support
+
+- See \`framework/api/README.md\` for API framework documentation
+- Review test examples in \`tests/api/\` directory
+- Check \`API_COMPARISON_TESTING_GUIDE.md\` in project root for detailed documentation
+
+**Happy Testing!** 🚀
+`;
+
     await this.createFile('framework/api/index.ts', apiIndex);
     await this.createFile('framework/api/README.md', apiReadme);
     await this.createFile('tests/api/users.spec.ts', apiTest);
     await this.createFile('tests/api/api-comparison.spec.ts', apiComparisonTest);
+    await this.createFile('API_COMPARISON_TESTING_GUIDE.md', apiTestingGuide);
 
     console.log('✅ API scaffold generated with reusable methods and comparison utilities');
   }
