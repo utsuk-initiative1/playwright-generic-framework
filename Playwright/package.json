@@ -1,5 +1,5 @@
 {
-  "name": "Mobile-android-ios",
+  "name": "Graphql",
   "version": "2.0.0",
   "description": "Comprehensive Playwright automation framework",
   "main": "index.js",
@@ -31,10 +31,7 @@
     "framework:setup": "node -e \"console.log('Framework setup completed. Update framework.config.ts with your application URLs.')\"",
     "framework:docs": "echo 'Framework documentation available at docs/README.md'",
     "test:api": "playwright test tests/api/ --config=framework.config.ts",
-    "test:visual": "playwright test tests/visual/ --config=framework.config.ts",
-    "update-baselines": "playwright test --update-snapshots",
     "lighthouse": "lighthouse --output html --output-path ./performance-results/",
-    "test:mobile-only": "playwright test tests/mobile/ --config=framework.config.ts",
     "docker:build": "docker build -t playwright-tests .",
     "docker:run": "docker run playwright-tests",
     "test:cloud": "playwright test --config=cloud.config.ts"
@@ -48,10 +45,7 @@
     "typescript",
     "page-object-model",
     "api-testing",
-    "visual-testing",
     "performance-testing",
-    "accessibility-testing",
-    "mobile-testing",
     "ci-cd",
     "docker",
     "cloud-testing"
@@ -63,11 +57,7 @@
     "@types/node": "^20.11.24",
     "axios": "^1.6.0",
     "@types/axios": "^0.14.0",
-    "pixelmatch": "^5.3.0",
-    "pngjs": "^7.0.0",
-    "lighthouse": "^11.0.0",
-    "axe-core": "^4.8.0",
-    "@axe-core/playwright": "^4.8.0"
+    "lighthouse": "^11.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
